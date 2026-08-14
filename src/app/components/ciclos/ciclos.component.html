@@ -1,0 +1,31 @@
+<div class="list-container">
+  <div class="list-header">
+    <h2 class="list-title">Ciclos de Aulas</h2>
+    <div class="filters">
+      <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
+      <button (click)="toggleSort()">
+        Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
+      </button>
+    </div>
+  </div>
+
+  <table class="list-table">
+    <thead>
+      <tr>
+        <th (click)="toggleSort()">Nome</th>
+        <th>Data Início</th>
+        <th>Data Fim</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ciclo of filteredCiclos" (click)="selectCiclo(ciclo)">
+        <td>{{ ciclo.nome }}</td>
+        <td>{{ ciclo.dataInicio | date:'dd/MM/yyyy' }}</td>
+        <td>{{ ciclo.dataFim | date:'dd/MM/yyyy' }}</td>
+      </tr>
+      <tr *ngIf="filteredCiclos.length === 0">
+        <td colspan="3" style="text-align: center;">Nenhum ciclo encontrado.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

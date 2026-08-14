@@ -1,0 +1,27 @@
+<div class="list-container">
+  <div class="list-header">
+    <h2 class="list-title">Alunos</h2>
+    <div class="filters">
+      <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
+      <button (click)="toggleSort()">
+        Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
+      </button>
+    </div>
+  </div>
+
+  <table class="list-table">
+    <thead>
+      <tr>
+        <th (click)="toggleSort()">Nome</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let aluno of filteredAlunos" (click)="selectAluno(aluno)">
+        <td>{{ aluno.nome }}</td>
+      </tr>
+      <tr *ngIf="filteredAlunos.length === 0">
+        <td style="text-align: center;">Nenhum aluno encontrado.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

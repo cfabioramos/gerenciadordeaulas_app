@@ -1,0 +1,147 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: var(--text-light);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.header-content h1 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.main-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-sidebar {
+  background: linear-gradient(to bottom, var(--primary), var(--footer-bg));
+  width: var(--menu-collapsed-width);
+  transition: width 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 5;
+}
+
+.app-sidebar:hover {
+  width: var(--menu-expanded-width);
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: var(--text-light);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item .icon {
+  font-size: 1.2rem;
+  min-width: 30px; /* Space for the icon */
+}
+
+.nav-item .text {
+  margin-left: 10px;
+  font-size: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.app-sidebar:hover .nav-item .text {
+  opacity: 1;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+.app-footer {
+  background-color: var(--footer-bg);
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.footer-left a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-center {
+  font-weight: 600;
+  text-align: center;
+}
+
+.footer-right .signature {
+  font-style: italic;
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.2rem;
+}
+
+/* Specific Mobile adjustments for S25 layout */
+@media (max-width: 768px) {
+  .app-header {
+    height: 50px;
+  }
+  
+  .header-content h1 {
+    font-size: 1.2rem;
+  }
+  
+  /* Mobile menu behavior */
+  .app-sidebar {
+    position: absolute;
+    height: 100%;
+    width: var(--menu-collapsed-width);
+  }
+  
+  .app-sidebar:hover {
+    width: 220px;
+  }
+  
+  .app-footer {
+    padding: 0 10px;
+    font-size: 0.8rem;
+  }
+  
+  .footer-right .signature {
+    font-size: 1rem;
+  }
+}

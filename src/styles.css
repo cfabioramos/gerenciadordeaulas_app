@@ -1,0 +1,103 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary: #957D6A;
+  --primary-light: #b09987;
+  --footer-bg: #E0DDDC;
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  --menu-expanded-width: 250px;
+  --menu-collapsed-width: 60px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  background-color: #f9f9f9;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Utils for lists */
+.list-container {
+  padding: 20px;
+  width: 100%;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.list-title {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.filters input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filters button {
+  padding: 8px 12px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  background-color: var(--primary-light);
+}
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.list-table th, .list-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.list-table th {
+  background-color: #f1f1f1;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.list-table tr:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .list-table th, .list-table td {
+    padding: 10px;
+  }
+}
+
