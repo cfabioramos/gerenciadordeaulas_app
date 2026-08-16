@@ -56,6 +56,7 @@
   text-decoration: none;
   white-space: nowrap;
   transition: background-color 0.2s;
+  cursor: pointer;
 }
 
 .nav-item:hover, .nav-item.active {
@@ -64,7 +65,7 @@
 
 .nav-item .icon {
   font-size: 1.2rem;
-  min-width: 30px; /* Space for the icon */
+  min-width: 30px;
 }
 
 .nav-item .text {
@@ -115,33 +116,39 @@
   font-size: 1.2rem;
 }
 
-/* Specific Mobile adjustments for S25 layout */
 @media (max-width: 768px) {
-  .app-header {
-    height: 50px;
-  }
-  
-  .header-content h1 {
-    font-size: 1.2rem;
-  }
-  
-  /* Mobile menu behavior */
+  .app-header { height: 50px; }
+  .header-content h1 { font-size: 1.1rem; }
+  .main-wrapper { flex-direction: column; }
   .app-sidebar {
-    position: absolute;
-    height: 100%;
-    width: var(--menu-collapsed-width);
+    position: relative;
+    width: 100%;
+    height: auto;
+    background: var(--primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
   }
-  
-  .app-sidebar:hover {
-    width: 220px;
+  .app-sidebar:hover { width: 100%; }
+  .nav-menu {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 6px 0;
   }
-  
-  .app-footer {
-    padding: 0 10px;
-    font-size: 0.8rem;
+  .nav-item {
+    flex-direction: column;
+    padding: 6px 8px;
+    gap: 2px;
+    flex: 1;
+    justify-content: center;
   }
-  
-  .footer-right .signature {
-    font-size: 1rem;
+  .nav-item .icon { min-width: auto; }
+  .nav-item .text {
+    margin-left: 0;
+    font-size: 0.75rem;
+    opacity: 1;
+    text-align: center;
   }
+  .app-sidebar:hover .nav-item .text { opacity: 1; }
+  .app-content { width: 100%; padding: 10px 5px; }
+  .app-footer { padding: 0 10px; font-size: 0.75rem; height: 40px; }
+  .footer-right .signature { font-size: 0.9rem; }
 }

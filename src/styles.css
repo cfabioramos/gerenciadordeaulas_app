@@ -39,8 +39,68 @@ body {
 }
 
 .list-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.title-with-back {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background-color: rgba(149, 125, 106, 0.1);
+  color: var(--primary);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-back:hover {
+  background-color: rgba(149, 125, 106, 0.22);
+  color: #2c3e50;
+  transform: translateX(-2px);
+}
+
+/* Unified Header Styling (icon-free & baseline aligned) */
+.header-text-group {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+}
+
+.header-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.header-breadcrumbs .crumb {
+  color: #666;
+  font-weight: 500;
+}
+
+.header-breadcrumbs .crumb-sep {
+  color: #bdc3c7;
+  font-size: 0.8rem;
 }
 
 .filters {
@@ -68,13 +128,19 @@ body {
   background-color: var(--primary-light);
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
 .list-table {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  overflow: hidden;
 }
 
 .list-table th, .list-table td {
@@ -87,6 +153,11 @@ body {
   background-color: #f1f1f1;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.list-table td {
+  white-space: nowrap;
 }
 
 .list-table tr:hover {
@@ -94,10 +165,50 @@ body {
   cursor: pointer;
 }
 
-/* Mobile responsive adjustments */
+/* Mobile responsive adjustments (e.g. Samsung S25) */
 @media (max-width: 768px) {
-  .list-table th, .list-table td {
+  .list-container {
+    padding: 12px 8px;
+  }
+
+  .list-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .title-with-back {
+    justify-content: flex-start;
+  }
+
+  .list-title {
+    font-size: 1.25rem;
+  }
+
+  .filters {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .filters input {
+    flex: 1;
+    min-width: 0;
     padding: 10px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+  }
+
+  .filters button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+
+  .list-table th, .list-table td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
 }
 

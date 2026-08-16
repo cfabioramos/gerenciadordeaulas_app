@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
 
 @Component({
@@ -18,10 +18,27 @@ export class PresencaComponent implements OnInit {
   sortAscending: boolean = true;
   aulaId!: number;
 
+  cicloNome: string = '';
+  programaNome: string = '';
+  aulaNome: string = '';
+
   constructor(
     private service: GerenciadorAulasService,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private location: Location,
+    private router: Router
+  ) {
+    const nav = this.router.getCurrentNavigation();
+    if (nav?.extras.state) {
+      this.cicloNome = nav.extras.state['cicloNome'] || '';
+      this.programaNome = nav.extras.state['programaNome'] || '';
+      this.aulaNome = nav.extras.state['aulaNome'] || '';
+    } else if (history.state) {
+      this.cicloNome = history.state['cicloNome'] || '';
+      this.programaNome = history.state['programaNome'] || '';
+      this.aulaNome = history.state['aulaNome'] || '';
+    }
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -35,8 +52,20 @@ export class PresencaComponent implements OnInit {
 
   loadAlunos() {
     this.service.getPresencasPorAula(this.aulaId).subscribe(data => {
-      // O backend deve retornar uma lista onde cada item tem 'nome', 'isPresente', 'idMatricula', etc.
-      this.alunos = data;
+      this.alunos = (data || []).map((a: any) => {
+        const isPresente = Boolean(
+          a.isPresente ?? 
+          a.presente ?? 
+          a.present ?? 
+          (a.idPresenca !== null && a.idPresenca !== undefined && a.idPresenca !== 0)
+        );
+
+        return {
+          ...a,
+          isPresente: isPresente,
+          idMatricula: a.idMatricula ?? a.matriculaId ?? a.matricula?.id ?? a.id
+        };
+      });
       this.applyFilter();
     });
   }
@@ -63,12 +92,20 @@ export class PresencaComponent implements OnInit {
     });
   }
 
-  onTogglePresenca(aluno: any) {
+  onTogglePresenca(aluno: any, event?: Event) {
+    if (event && event.target) {
+      aluno.isPresente = (event.target as HTMLInputElement).checked;
+    }
+
+    const matriculaId = aluno.idMatricula ?? aluno.matriculaId ?? aluno.id;
+
     if (aluno.isPresente) {
       // Usuário marcou como presente (true)
-      this.service.registrarPresenca(this.aulaId, aluno.idMatricula).subscribe({
+      this.service.registrarPresenca(this.aulaId, matriculaId).subscribe({
         next: (res) => {
-          aluno.idPresenca = res.id; // Salva o ID da presença criada para futura deleção
+          if (res && res.id) {
+            aluno.idPresenca = res.id;
+          }
         },
         error: (err) => {
           console.error('Erro ao registrar presença', err);
@@ -77,8 +114,9 @@ export class PresencaComponent implements OnInit {
       });
     } else {
       // Usuário desmarcou (false)
-      if (aluno.idPresenca) {
-        this.service.removerPresenca(aluno.idPresenca).subscribe({
+      const presencaId = aluno.idPresenca ?? aluno.id;
+      if (presencaId) {
+        this.service.removerPresenca(presencaId).subscribe({
           next: () => {
             aluno.idPresenca = null;
           },
@@ -89,5 +127,9 @@ export class PresencaComponent implements OnInit {
         });
       }
     }
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

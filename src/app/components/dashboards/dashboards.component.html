@@ -1,9 +1,137 @@
-<div class="list-container">
-  <div class="list-header">
-    <h2 class="list-title">Dashboards</h2>
+<div class="dashboard-container">
+  <!-- Header & Title -->
+  <div class="dashboard-header">
+    <div>
+      <h2 class="dashboard-title">📊 Dashboard de Frequência dos Alunos</h2>
+      <p class="dashboard-subtitle">Visão geral do engajamento e presença nas aulas</p>
+    </div>
+
+    <!-- View Selector Buttons -->
+    <div class="view-toggle">
+      <button 
+        [class.active]="selectedView === 'bars'" 
+        (click)="selectedView = 'bars'">
+        📊 Barras
+      </button>
+      <button 
+        [class.active]="selectedView === 'columns'" 
+        (click)="selectedView = 'columns'">
+        📈 Colunas
+      </button>
+      <button 
+        [class.active]="selectedView === 'ranking'" 
+        (click)="selectedView = 'ranking'">
+        🏆 Ranking
+      </button>
+    </div>
   </div>
-  
-  <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <p>Os dashboards serão implementados nesta seção.</p>
+
+  <!-- Summary KPI Metric Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">🎓</div>
+      <div class="kpi-info">
+        <span class="kpi-label">Total de Alunos</span>
+        <span class="kpi-value">{{ totalAlunos }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">📈</div>
+      <div class="kpi-info">
+        <span class="kpi-label">Média de Frequência</span>
+        <span class="kpi-value">{{ mediaFrequencia }}%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">🥇</div>
+      <div class="kpi-info">
+        <span class="kpi-label">Maior Frequência</span>
+        <span class="kpi-value highlight-green">{{ maiorFrequencia }}%</span>
+        <small class="kpi-subtext">{{ melhorAluno }}</small>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-info">
+        <span class="kpi-label">Menor Frequência</span>
+        <span class="kpi-value highlight-red">{{ menorFrequencia }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 1: Horizontal Bar Chart -->
+  <div *ngIf="selectedView === 'bars'" class="chart-card">
+    <h3 class="chart-title">Percentual de Presença por Aluno</h3>
+    <div class="horizontal-bars-container">
+      <div *ngFor="let item of dadosPresenca" class="bar-row">
+        <div class="bar-name">{{ item.nome }}</div>
+        <div class="bar-track">
+          <div 
+            class="bar-fill" 
+            [ngClass]="getStatusClass(item.percentual)"
+            [style.width.%]="item.percentual">
+            <span class="bar-text-inside" *ngIf="item.percentual >= 20">{{ item.percentual }}%</span>
+          </div>
+          <span class="bar-text-outside" *ngIf="item.percentual < 20">{{ item.percentual }}%</span>
+        </div>
+        <div class="bar-badge">
+          <span class="badge" [ngClass]="getStatusClass(item.percentual)">
+            {{ getStatusLabel(item.percentual) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: Vertical Column Chart -->
+  <div *ngIf="selectedView === 'columns'" class="chart-card">
+    <h3 class="chart-title">Comparativo em Colunas Verticais</h3>
+    <div class="column-chart-wrapper">
+      <div class="column-chart-container">
+        <div *ngFor="let item of dadosPresenca" class="column-item">
+          <div class="column-bar-wrapper">
+            <div class="column-tooltip">{{ item.percentual }}%</div>
+            <div 
+              class="column-bar" 
+              [ngClass]="getStatusClass(item.percentual)"
+              [style.height.%]="item.percentual">
+            </div>
+          </div>
+          <span class="column-label">{{ item.nome }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 3: Ranking Cards with Gauge Rings -->
+  <div *ngIf="selectedView === 'ranking'" class="ranking-grid">
+    <div *ngFor="let item of dadosPresenca; let i = index" class="ranking-card">
+      <div class="ranking-header">
+        <span class="rank-number">#{{ i + 1 }}</span>
+        <span class="badge" [ngClass]="getStatusClass(item.percentual)">
+          {{ getStatusLabel(item.percentual) }}
+        </span>
+      </div>
+
+      <div class="gauge-wrapper">
+        <svg class="gauge-svg" viewBox="0 0 80 80">
+          <circle class="gauge-bg" cx="40" cy="40" r="36" />
+          <circle 
+            class="gauge-progress" 
+            [ngClass]="getStatusClass(item.percentual)"
+            cx="40" 
+            cy="40" 
+            r="36"
+            [style.strokeDashoffset]="getStrokeOffset(item.percentual)"
+          />
+        </svg>
+        <span class="gauge-value">{{ item.percentual }}%</span>
+      </div>
+
+      <h4 class="ranking-name">{{ item.nome }}</h4>
+    </div>
   </div>
 </div>

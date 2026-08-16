@@ -9,19 +9,21 @@
     </div>
   </div>
 
-  <table class="list-table">
-    <thead>
-      <tr>
-        <th (click)="toggleSort()">Nome</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let aluno of filteredAlunos" (click)="selectAluno(aluno)">
-        <td>{{ aluno.nome }}</td>
-      </tr>
-      <tr *ngIf="filteredAlunos.length === 0">
-        <td style="text-align: center;">Nenhum aluno encontrado.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th (click)="toggleSort()">Nome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let aluno of filteredAlunos" (click)="selectAluno(aluno)">
+          <td>{{ aluno.nome }}</td>
+        </tr>
+        <tr *ngIf="filteredAlunos.length === 0">
+          <td style="text-align: center;">Nenhum aluno encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

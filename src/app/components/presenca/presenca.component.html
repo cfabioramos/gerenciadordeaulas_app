@@ -1,6 +1,21 @@
 <div class="list-container">
   <div class="list-header">
-    <h2 class="list-title">Presença</h2>
+    <div class="title-with-back">
+      <button class="btn-back" (click)="goBack()" title="Voltar">
+        ←
+      </button>
+      <div class="header-text-group">
+        <h2 class="list-title">Presença</h2>
+
+        <nav class="header-breadcrumbs" *ngIf="cicloNome || programaNome || aulaNome">
+          <span *ngIf="cicloNome" class="crumb">{{ cicloNome }}</span>
+          <span *ngIf="cicloNome && (programaNome || aulaNome)" class="crumb-sep">/</span>
+          <span *ngIf="programaNome" class="crumb">{{ programaNome }}</span>
+          <span *ngIf="programaNome && aulaNome" class="crumb-sep">/</span>
+          <span *ngIf="aulaNome" class="crumb">{{ aulaNome }}</span>
+        </nav>
+      </div>
+    </div>
     <div class="filters">
       <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
       <button (click)="toggleSort()">
@@ -9,26 +24,32 @@
     </div>
   </div>
 
-  <table class="list-table">
-    <thead>
-      <tr>
-        <th (click)="toggleSort()">Nome</th>
-        <th>Presente?</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let aluno of filteredAlunos">
-        <td>{{ aluno.nome }}</td>
-        <td>
-          <label class="switch">
-            <input type="checkbox" [(ngModel)]="aluno.isPresente" (change)="onTogglePresenca(aluno)">
-            <span class="slider round"></span>
-          </label>
-        </td>
-      </tr>
-      <tr *ngIf="filteredAlunos.length === 0">
-        <td colspan="2" style="text-align: center;">Nenhum aluno encontrado para esta aula.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th (click)="toggleSort()">Nome</th>
+          <th>Presente?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let aluno of filteredAlunos">
+          <td>{{ aluno.nome }}</td>
+          <td>
+            <label class="switch">
+              <input 
+                type="checkbox" 
+                [checked]="aluno.isPresente" 
+                [(ngModel)]="aluno.isPresente" 
+                (change)="onTogglePresenca(aluno, $event)">
+              <span class="slider round"></span>
+            </label>
+          </td>
+        </tr>
+        <tr *ngIf="filteredAlunos.length === 0">
+          <td colspan="2" style="text-align: center;">Nenhum aluno encontrado para esta aula.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -1,6 +1,17 @@
 <div class="list-container">
   <div class="list-header">
-    <h2 class="list-title">Programas de Aulas</h2>
+    <div class="title-with-back">
+      <button class="btn-back" (click)="goBack()" title="Voltar">
+        ←
+      </button>
+      <div class="header-text-group">
+        <h2 class="list-title">Programas de Aulas</h2>
+
+        <nav class="header-breadcrumbs" *ngIf="cicloNome">
+          <span class="crumb">{{ cicloNome }}</span>
+        </nav>
+      </div>
+    </div>
     <div class="filters">
       <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
       <button (click)="toggleSort()">
@@ -9,19 +20,21 @@
     </div>
   </div>
 
-  <table class="list-table">
-    <thead>
-      <tr>
-        <th (click)="toggleSort()">Nome</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let programa of filteredProgramas" (click)="selectPrograma(programa)">
-        <td>{{ programa.nome }}</td>
-      </tr>
-      <tr *ngIf="filteredProgramas.length === 0">
-        <td style="text-align: center;">Nenhum programa de aulas encontrado.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th (click)="toggleSort()">Nome</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let programa of filteredProgramas" (click)="selectPrograma(programa)">
+          <td>{{ programa.nome }}</td>
+        </tr>
+        <tr *ngIf="filteredProgramas.length === 0">
+          <td style="text-align: center;">Nenhum programa de aulas encontrado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

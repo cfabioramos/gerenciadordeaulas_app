@@ -1,24 +1,30 @@
 <div class="list-container">
   <div class="list-header">
-    <h2 class="list-title">Matrículas do Aluno</h2>
+    <div class="title-with-back">
+      <button class="btn-back" (click)="goBack()" title="Voltar">
+        ←
+      </button>
+      <h2 class="list-title">Matrículas do Aluno</h2>
+    </div>
   </div>
 
-  <table class="list-table">
-    <thead>
-      <tr>
-        <th>ID Matrícula</th>
-        <th>Status/Programa</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let matricula of matriculas">
-        <td>{{ matricula.id }}</td>
-        <!-- Exibição genérica das outras propriedades retornadas pelo DTO, ex: matricula.idProgramaAula ou outro dado -->
-        <td>{{ matricula.nomeProgramaAula || 'Mapeado na API' }}</td>
-      </tr>
-      <tr *ngIf="matriculas.length === 0">
-        <td colspan="2" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>ID Matrícula</th>
+          <th>Status/Programa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let matricula of matriculas">
+          <td>{{ matricula.id }}</td>
+          <td>{{ matricula.nomeProgramaAula || 'Mapeado na API' }}</td>
+        </tr>
+        <tr *ngIf="matriculas.length === 0">
+          <td colspan="2" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
