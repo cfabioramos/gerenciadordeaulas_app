@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
@@ -17,20 +17,53 @@ export class ProgramaAulasComponent implements OnInit {
   searchTerm: string = '';
   sortAscending: boolean = true;
   cicloId: number | null = null;
+  cicloNome: string = '';
 
   constructor(
     private service: GerenciadorAulasService,
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private location: Location
+  ) {
+    const nav = this.router.getCurrentNavigation();
+    if (nav?.extras.state?.['cicloNome']) {
+      this.cicloNome = nav.extras.state['cicloNome'];
+    } else if (history.state?.['cicloNome']) {
+      this.cicloNome = history.state['cicloNome'];
+    }
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('cicloId');
       if (id) {
         this.cicloId = +id;
+        if (!this.cicloNome) {
+          this.loadCicloInfo();
+        }
       }
       this.loadProgramas();
+    });
+  }
+
+  loadCicloInfo() {
+    if (!this.cicloId) return;
+    this.service.getCiclos().subscribe({
+      next: (ciclos) => {
+        const ciclo = (ciclos || []).find((c: any) => c.id === this.cicloId);
+        if (ciclo && ciclo.nome) {
+          this.cicloNome = ciclo.nome;
+        }
+      },
+      error: () => {
+        if (this.cicloId) {
+          this.service.getCicloPorId(this.cicloId).subscribe(c => {
+            if (c && c.nome) {
+              this.cicloNome = c.nome;
+            }
+          });
+        }
+      }
     });
   }
 
@@ -64,6 +97,15 @@ export class ProgramaAulasComponent implements OnInit {
   }
 
   selectPrograma(programa: any) {
-    this.router.navigate(['/programas', programa.id, 'aulas']);
+    this.router.navigate(['/programas', programa.id, 'aulas'], {
+      state: {
+        cicloNome: this.cicloNome,
+        programaNome: programa.nome
+      }
+    });
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

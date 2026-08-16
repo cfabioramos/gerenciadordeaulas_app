@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
 
@@ -16,7 +16,8 @@ export class MatriculasComponent implements OnInit {
 
   constructor(
     private service: GerenciadorAulasService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -33,5 +34,9 @@ export class MatriculasComponent implements OnInit {
     this.service.getMatriculas(this.alunoId).subscribe(data => {
       this.matriculas = data;
     });
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

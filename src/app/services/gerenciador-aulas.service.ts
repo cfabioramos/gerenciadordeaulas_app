@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_URL } from '../../environments/environment';
 
-export const API_URL = 'https://gerenciadordeaulas-1.onrender.com';
+export { API_URL };
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,10 @@ export class GerenciadorAulasService {
 
   getCiclos(): Observable<any[]> {
     return this.http.get<any[]>(`${API_URL}/ciclos`);
+  }
+
+  getCicloPorId(id: number): Observable<any> {
+    return this.http.get<any>(`${API_URL}/ciclos/${id}`);
   }
 
   getProgramaAulas(cicloId?: number): Observable<any[]> {
