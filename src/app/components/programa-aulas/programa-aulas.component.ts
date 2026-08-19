@@ -26,10 +26,12 @@ export class ProgramaAulasComponent implements OnInit {
     private location: Location
   ) {
     const nav = this.router.getCurrentNavigation();
-    if (nav?.extras.state?.['cicloNome']) {
-      this.cicloNome = nav.extras.state['cicloNome'];
-    } else if (history.state?.['cicloNome']) {
-      this.cicloNome = history.state['cicloNome'];
+    if (nav?.extras.state) {
+      this.cicloId = nav.extras.state['cicloId'] || null;
+      this.cicloNome = nav.extras.state['cicloNome'] || '';
+    } else if (history.state) {
+      this.cicloId = history.state['cicloId'] || null;
+      this.cicloNome = history.state['cicloNome'] || '';
     }
   }
 
@@ -99,10 +101,26 @@ export class ProgramaAulasComponent implements OnInit {
   selectPrograma(programa: any) {
     this.router.navigate(['/programas', programa.id, 'aulas'], {
       state: {
+        cicloId: this.cicloId,
         cicloNome: this.cicloNome,
+        programaId: programa.id,
         programaNome: programa.nome
       }
     });
+  }
+
+  goToCiclos() {
+    this.router.navigate(['/ciclos']);
+  }
+
+  goToProgramas() {
+    if (this.cicloId) {
+      this.router.navigate(['/ciclos', this.cicloId, 'programas'], {
+        state: { cicloId: this.cicloId, cicloNome: this.cicloNome }
+      });
+    } else {
+      this.router.navigate(['/programas']);
+    }
   }
 
   goBack() {

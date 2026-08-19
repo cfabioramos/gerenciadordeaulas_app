@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../environments/environment';
+import { Matricula } from '../components/presenca/presenca.component';
 
 export { API_URL };
 
@@ -32,14 +33,14 @@ export class GerenciadorAulasService {
     return this.http.get<any[]>(`${API_URL}/aulas`);
   }
 
-  getPresencasPorAula(aulaId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/alunos/aula/${aulaId}`);
+  getPresencasPorAula(aulaId: number): Observable<Matricula[]> {
+    return this.http.get<Matricula[]>(`${API_URL}/matriculas/aula/${aulaId}`);
   }
 
   registrarPresenca(aulaId: number, matriculaId: number): Observable<any> {
     const payload = {
-      aula: { id: aulaId },
-      matricula: { id: matriculaId }
+      matriculaId: matriculaId,
+      aulaId: aulaId
     };
     return this.http.post<any>(`${API_URL}/presencas`, payload);
   }

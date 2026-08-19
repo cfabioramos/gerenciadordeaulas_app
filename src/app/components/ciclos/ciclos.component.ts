@@ -53,7 +53,7 @@ export class CiclosComponent implements OnInit {
 
   selectCiclo(ciclo: any) {
     this.router.navigate(['/ciclos', ciclo.id, 'programas'], {
-      state: { cicloNome: ciclo.nome }
+      state: { cicloId: ciclo.id, cicloNome: ciclo.nome }
     });
   }
 }

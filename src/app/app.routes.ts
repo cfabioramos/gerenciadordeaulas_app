@@ -10,8 +10,11 @@ import { DashboardsComponent } from './components/dashboards/dashboards.componen
 export const routes: Routes = [
   { path: 'ciclos', component: CiclosComponent },
   { path: 'ciclos/:cicloId/programas', component: ProgramaAulasComponent },
+  { path: 'programas', component: ProgramaAulasComponent },
   { path: 'programas/:programaId/aulas', component: AulasComponent },
+  { path: 'aulas', component: AulasComponent },
   { path: 'aulas/:aulaId/presencas', component: PresencaComponent },
+  { path: 'presenca', component: PresencaComponent },
   { path: 'alunos', component: AlunosComponent },
   { path: 'alunos/:alunoId/matriculas', component: MatriculasComponent },
   { path: 'dashboards', component: DashboardsComponent },

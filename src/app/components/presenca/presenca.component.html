@@ -5,14 +5,16 @@
         ←
       </button>
       <div class="header-text-group">
-        <h2 class="list-title">Presença</h2>
+        <h2 class="list-title">
+          <a (click)="goToPresencas()" class="title-link" title="Presença">Presença</a>
+        </h2>
 
         <nav class="header-breadcrumbs" *ngIf="cicloNome || programaNome || aulaNome">
-          <span *ngIf="cicloNome" class="crumb">{{ cicloNome }}</span>
+          <a *ngIf="cicloNome" (click)="goToCiclos()" class="crumb crumb-link" title="Ir para Ciclos de Aulas">{{ cicloNome }}</a>
           <span *ngIf="cicloNome && (programaNome || aulaNome)" class="crumb-sep">/</span>
-          <span *ngIf="programaNome" class="crumb">{{ programaNome }}</span>
+          <a *ngIf="programaNome" (click)="goToProgramas()" class="crumb crumb-link" title="Ir para Programas de Aulas">{{ programaNome }}</a>
           <span *ngIf="programaNome && aulaNome" class="crumb-sep">/</span>
-          <span *ngIf="aulaNome" class="crumb">{{ aulaNome }}</span>
+          <a *ngIf="aulaNome" (click)="goToAulas()" class="crumb crumb-link" title="Ir para Aulas">{{ aulaNome }}</a>
         </nav>
       </div>
     </div>
@@ -33,21 +35,21 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let aluno of filteredAlunos">
-          <td>{{ aluno.nome }}</td>
+        <tr *ngFor="let matricula of filteredMatriculas">
+          <td>{{ matricula.alunoNome }}</td>
           <td>
             <label class="switch">
               <input 
                 type="checkbox" 
-                [checked]="aluno.isPresente" 
-                [(ngModel)]="aluno.isPresente" 
-                (change)="onTogglePresenca(aluno, $event)">
+                [checked]="matricula.presente" 
+                [(ngModel)]="matricula.presente" 
+                (change)="onTogglePresenca(matricula, $event)">
               <span class="slider round"></span>
             </label>
           </td>
         </tr>
-        <tr *ngIf="filteredAlunos.length === 0">
-          <td colspan="2" style="text-align: center;">Nenhum aluno encontrado para esta aula.</td>
+        <tr *ngIf="filteredMatriculas.length === 0">
+          <td colspan="2" style="text-align: center;">Nenhuma presença encontrada para esta aula.</td>
         </tr>
       </tbody>
     </table>
