@@ -5,12 +5,14 @@
         ←
       </button>
       <div class="header-text-group">
-        <h2 class="list-title">Aulas</h2>
+        <h2 class="list-title">
+          <a (click)="goToAulas()" class="title-link" title="Aulas">Aulas</a>
+        </h2>
 
         <nav class="header-breadcrumbs" *ngIf="cicloNome || programaNome">
-          <span *ngIf="cicloNome" class="crumb">{{ cicloNome }}</span>
+          <a *ngIf="cicloNome" (click)="goToCiclos()" class="crumb crumb-link" title="Ir para Ciclos de Aulas">{{ cicloNome }}</a>
           <span *ngIf="cicloNome && programaNome" class="crumb-sep">/</span>
-          <span *ngIf="programaNome" class="crumb">{{ programaNome }}</span>
+          <a *ngIf="programaNome" (click)="goToProgramas()" class="crumb crumb-link" title="Ir para Programas de Aulas">{{ programaNome }}</a>
         </nav>
       </div>
     </div>

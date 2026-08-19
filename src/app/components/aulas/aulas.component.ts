@@ -18,6 +18,7 @@ export class AulasComponent implements OnInit {
   sortAscending: boolean = true;
   programaId: number | null = null;
 
+  cicloId: number | null = null;
   cicloNome: string = '';
   programaNome: string = '';
 
@@ -29,9 +30,11 @@ export class AulasComponent implements OnInit {
   ) {
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras.state) {
+      this.cicloId = nav.extras.state['cicloId'] || null;
       this.cicloNome = nav.extras.state['cicloNome'] || '';
       this.programaNome = nav.extras.state['programaNome'] || '';
     } else if (history.state) {
+      this.cicloId = history.state['cicloId'] || null;
       this.cicloNome = history.state['cicloNome'] || '';
       this.programaNome = history.state['programaNome'] || '';
     }
@@ -42,7 +45,7 @@ export class AulasComponent implements OnInit {
       const id = params.get('programaId');
       if (id) {
         this.programaId = +id;
-        if (!this.programaNome) {
+        if (!this.programaNome || !this.cicloId) {
           this.loadProgramaInfo();
         }
       }
@@ -57,9 +60,11 @@ export class AulasComponent implements OnInit {
         const prog = (programas || []).find((p: any) => p.id === this.programaId);
         if (prog) {
           if (prog.nome) this.programaNome = prog.nome;
+          if (prog.cicloId) this.cicloId = prog.cicloId;
+          if (prog.ciclo?.id) this.cicloId = prog.ciclo.id;
           if (prog.ciclo?.nome) this.cicloNome = prog.ciclo.nome;
-          else if (prog.cicloId && !this.cicloNome) {
-            this.service.getCicloPorId(prog.cicloId).subscribe(c => {
+          else if (this.cicloId && !this.cicloNome) {
+            this.service.getCicloPorId(this.cicloId).subscribe(c => {
               if (c && c.nome) this.cicloNome = c.nome;
             });
           }
@@ -100,11 +105,43 @@ export class AulasComponent implements OnInit {
   selectAula(aula: any) {
     this.router.navigate(['/aulas', aula.id, 'presencas'], {
       state: {
+        cicloId: this.cicloId,
         cicloNome: this.cicloNome,
+        programaId: this.programaId,
         programaNome: this.programaNome,
+        aulaId: aula.id,
         aulaNome: aula.nome
       }
     });
+  }
+
+  goToCiclos() {
+    this.router.navigate(['/ciclos']);
+  }
+
+  goToProgramas() {
+    if (this.cicloId) {
+      this.router.navigate(['/ciclos', this.cicloId, 'programas'], {
+        state: { cicloId: this.cicloId, cicloNome: this.cicloNome }
+      });
+    } else {
+      this.router.navigate(['/programas']);
+    }
+  }
+
+  goToAulas() {
+    if (this.programaId) {
+      this.router.navigate(['/programas', this.programaId, 'aulas'], {
+        state: {
+          cicloId: this.cicloId,
+          cicloNome: this.cicloNome,
+          programaId: this.programaId,
+          programaNome: this.programaNome
+        }
+      });
+    } else {
+      this.router.navigate(['/aulas']);
+    }
   }
 
   goBack() {

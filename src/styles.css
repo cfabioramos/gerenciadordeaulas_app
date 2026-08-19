@@ -93,9 +93,33 @@ body {
   font-weight: 500;
 }
 
+.title-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.title-link:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
 .header-breadcrumbs .crumb {
   color: #666;
   font-weight: 500;
+}
+
+.header-breadcrumbs .crumb-link {
+  color: #4a5568;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.header-breadcrumbs .crumb-link:hover {
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 .header-breadcrumbs .crumb-sep {
