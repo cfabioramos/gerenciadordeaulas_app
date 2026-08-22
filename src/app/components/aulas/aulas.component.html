@@ -28,15 +28,17 @@
     <table class="list-table">
       <thead>
         <tr>
-          <th (click)="toggleSort()">Nome</th>
+          <th (click)="toggleSort()">Aula</th>
+          <th>Data</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let aula of filteredAulas" (click)="selectAula(aula)">
           <td>{{ aula.nome }}</td>
+          <td>{{ formatData(aula.data) }}</td>
         </tr>
         <tr *ngIf="filteredAulas.length === 0">
-          <td style="text-align: center;">Nenhuma aula encontrada.</td>
+          <td colspan="2" style="text-align: center;">Nenhuma aula encontrada.</td>
         </tr>
       </tbody>
     </table>

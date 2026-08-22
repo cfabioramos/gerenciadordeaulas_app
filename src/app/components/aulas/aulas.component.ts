@@ -102,6 +102,39 @@ export class AulasComponent implements OnInit {
     });
   }
 
+  formatData(dataInput: Date | string | null | undefined): string {
+    if (!dataInput) return '';
+
+    let d: Date;
+    if (dataInput instanceof Date) {
+      d = dataInput;
+    } else if (typeof dataInput === 'string') {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dataInput)) {
+        const [year, month, day] = dataInput.split('-').map(Number);
+        d = new Date(year, month - 1, day);
+      } else {
+        d = new Date(dataInput);
+      }
+    } else {
+      d = new Date(dataInput);
+    }
+
+    if (isNaN(d.getTime())) return '';
+
+    const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const meses = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    const diaSemana = diasSemana[d.getDay()];
+    const diaNumero = d.getDate();
+    const mesExtenso = meses[d.getMonth()];
+
+    return `${diaSemana}, dia ${diaNumero} de ${mesExtenso}`;
+  }
+
+
   selectAula(aula: any) {
     this.router.navigate(['/aulas', aula.id, 'presencas'], {
       state: {
