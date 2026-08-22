@@ -22,15 +22,11 @@ export class GerenciadorAulasService {
   }
 
   getProgramaAulas(cicloId?: number): Observable<any[]> {
-    // If we want to filter by cicloId we can pass it, or just use the global one as requested:
-    // User plan said: GET /programa-aulas
-    // We can also use /programa-aulas/ciclo/:id if the API supports it, but plan says /programa-aulas
-    return this.http.get<any[]>(`${API_URL}/programa-aulas`);
+    return this.http.get<any[]>(`${API_URL}/programa-aulas/ciclo/${cicloId}`);
   }
 
   getAulas(programaId?: number): Observable<any[]> {
-    // Similarly, plan says: GET /aulas
-    return this.http.get<any[]>(`${API_URL}/aulas`);
+    return this.http.get<any[]>(`${API_URL}/aulas/programaAula/${programaId}`);
   }
 
   getPresencasPorAula(aulaId: number): Observable<Matricula[]> {
@@ -51,6 +47,10 @@ export class GerenciadorAulasService {
 
   getAlunos(): Observable<any[]> {
     return this.http.get<any[]>(`${API_URL}/alunos`);
+  }
+
+  criarAluno(aluno: { nome: string }): Observable<any> {
+    return this.http.post<any>(`${API_URL}/alunos`, aluno);
   }
 
   getMatriculas(alunoId: number): Observable<any[]> {
