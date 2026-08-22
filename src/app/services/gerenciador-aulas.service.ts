@@ -49,6 +49,10 @@ export class GerenciadorAulasService {
     return this.http.get<any[]>(`${API_URL}/alunos`);
   }
 
+  criarAluno(aluno: { nome: string }): Observable<any> {
+    return this.http.post<any>(`${API_URL}/alunos`, aluno);
+  }
+
   getMatriculas(alunoId: number): Observable<any[]> {
     return this.http.get<any[]>(`${API_URL}/matriculas/aluno/${alunoId}`);
   }

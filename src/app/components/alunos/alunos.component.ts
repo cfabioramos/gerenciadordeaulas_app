@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { NovoAlunoComponent } from './novo-aluno/novo-aluno.component';
 
 @Component({
   selector: 'app-alunos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NovoAlunoComponent],
   templateUrl: './alunos.component.html',
   styleUrl: './alunos.component.css'
 })
@@ -16,6 +17,7 @@ export class AlunosComponent implements OnInit {
   filteredAlunos: any[] = [];
   searchTerm: string = '';
   sortAscending: boolean = true;
+  showNovoAlunoModal: boolean = false;
 
   constructor(
     private service: GerenciadorAulasService,
@@ -23,6 +25,10 @@ export class AlunosComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadAlunos();
+  }
+
+  loadAlunos() {
     this.service.getAlunos().subscribe(data => {
       this.alunos = data;
       this.applyFilter();
@@ -53,5 +59,10 @@ export class AlunosComponent implements OnInit {
 
   selectAluno(aluno: any) {
     this.router.navigate(['/alunos', aluno.id, 'matriculas']);
+  }
+
+  onAlunoCriado(novoAluno: any) {
+    this.showNovoAlunoModal = false;
+    this.loadAlunos();
   }
 }

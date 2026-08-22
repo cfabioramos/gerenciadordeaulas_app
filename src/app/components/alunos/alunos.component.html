@@ -6,6 +6,9 @@
       <button (click)="toggleSort()">
         Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
       </button>
+      <button class="btn-add" (click)="showNovoAlunoModal = true" title="Cadastrar Aluno">
+        +
+      </button>
     </div>
   </div>
 
@@ -27,3 +30,9 @@
     </table>
   </div>
 </div>
+
+<app-novo-aluno
+  *ngIf="showNovoAlunoModal"
+  (alunoCriado)="onAlunoCriado($event)"
+  (cancelado)="showNovoAlunoModal = false">
+</app-novo-aluno>
