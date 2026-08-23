@@ -4,7 +4,10 @@
       <button class="btn-back" (click)="goBack()" title="Voltar">
         ←
       </button>
-      <h2 class="list-title">Matrículas do Aluno</h2>
+      <h2 class="list-title">Matrículas de {{ alunoNome || 'Aluno' }}</h2>
+      <button class="btn-add-matricula" (click)="openNovaMatriculaModal()" title="Nova Matrícula">
+        + Nova Matrícula
+      </button>
     </div>
   </div>
 
@@ -12,19 +15,88 @@
     <table class="list-table">
       <thead>
         <tr>
-          <th>ID Matrícula</th>
-          <th>Status/Programa</th>
+          <th>Programa de Aula</th>
+          <th>Data de Matrícula</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let matricula of matriculas">
-          <td>{{ matricula.id }}</td>
-          <td>{{ matricula.nomeProgramaAula || 'Mapeado na API' }}</td>
+          <td>{{ matricula.programaAulaNome }}</td>
+          <td>{{ matricula.data | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <button class="btn-delete" (click)="deletarMatricula(matricula.id)" title="Remover Matrícula">
+              Remover
+            </button>
+          </td>
         </tr>
         <tr *ngIf="matriculas.length === 0">
-          <td colspan="2" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
+          <td colspan="3" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modal Nova Matrícula -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Nova Matrícula</h3>
+      <button type="button" class="btn-close" (click)="showModal = false" title="Fechar">&times;</button>
+    </div>
+
+    <form (ngSubmit)="salvarMatricula()">
+      <div class="modal-body">
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-group">
+          <label for="selectCiclo">Ciclo</label>
+          <select
+            id="selectCiclo"
+            class="form-control"
+            [(ngModel)]="selectedCicloId"
+            (change)="onCicloChange()"
+            name="selectedCicloId"
+            required
+          >
+            <option [ngValue]="null" disabled>Selecione um ciclo...</option>
+            <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
+              {{ ciclo.nome }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="selectPrograma">Programa de Aula</label>
+          <select
+            id="selectPrograma"
+            class="form-control"
+            [(ngModel)]="selectedProgramaId"
+            name="selectedProgramaId"
+            [disabled]="!selectedCicloId || modalLoading"
+            required
+          >
+            <option [ngValue]="null" disabled>
+              {{ selectedCicloId ? 'Selecione um programa...' : 'Selecione um ciclo primeiro' }}
+            </option>
+            <option *ngFor="let prog of programas" [ngValue]="prog.id">
+              {{ prog.nome }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showModal = false" [disabled]="modalLoading">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="modalLoading || !selectedProgramaId">
+          {{ modalLoading ? 'Salvando...' : 'Confirmar Matrícula' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>
