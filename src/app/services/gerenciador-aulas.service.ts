@@ -56,4 +56,12 @@ export class GerenciadorAulasService {
   getMatriculas(alunoId: number): Observable<any[]> {
     return this.http.get<any[]>(`${API_URL}/matriculas/aluno/${alunoId}`);
   }
+
+  criarMatricula(matricula: any): Observable<any> {
+    return this.http.post<any>(`${API_URL}/matriculas`, matricula);
+  }
+
+  deletarMatricula(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/matriculas/${id}`);
+  }
 }
