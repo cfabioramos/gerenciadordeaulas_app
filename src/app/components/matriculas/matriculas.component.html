@@ -4,51 +4,73 @@
       <button class="btn-back" (click)="goBack()" title="Voltar">
         ←
       </button>
-      <h2 class="list-title">Matrículas de {{ alunoNome || 'Aluno' }}</h2>
+      <h2 class="list-title">Aluno: {{ alunoNome || 'Aluno' }}</h2>
+    </div>
+  </div>
+
+  <div class="tabs-nav">
+    <button class="tab-btn" [class.active]="activeTab === 'matriculas'" (click)="activeTab = 'matriculas'">
+      Matrículas
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pagamentos'" (click)="activeTab = 'pagamentos'">
+      Pagamentos
+    </button>
+  </div>
+
+  <!-- Pagamentos Tab -->
+  <div *ngIf="activeTab === 'pagamentos'">
+    <app-pagamentos [alunoId]="alunoId"></app-pagamentos>
+  </div>
+
+  <!-- Matrículas Tab -->
+  <div *ngIf="activeTab === 'matriculas'">
+    <div class="actions-header">
       <button class="btn-add-matricula" (click)="openNovaMatriculaModal()" title="Nova Matrícula">
         + Nova Matrícula
       </button>
     </div>
-  </div>
 
-  <div class="table-responsive">
-    <table class="list-table">
-      <thead>
-        <tr>
-          <th>Programa de Aula</th>
-          <th>Data de Matrícula</th>
-          <th>Valor</th>
-          <th>Mensalidade</th>
-          <th>Vencimento</th>
-          <th>Ativo</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let matricula of matriculas" (click)="openEditarMatriculaModal(matricula)">
-          <td>{{ matricula.programaAulaNome }}</td>
-          <td>{{ matricula.data | date:'dd/MM/yyyy' }}</td>
-          <td>{{ matricula.valor ? (matricula.valor | currency:'BRL':'symbol':'1.2-2') : '-' }}</td>
-          <td>{{ matricula.valorMensalidade ? (matricula.valorMensalidade | currency:'BRL':'symbol':'1.2-2') : '-' }}
-          </td>
-          <td>{{ matricula.diaVencimento ? 'Dia ' + matricula.diaVencimento : '-' }}</td>
-          <td>
-            <label class="switch" (click)="$event.stopPropagation()">
-              <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)">
-              <span class="slider round"></span>
-            </label>
-          </td>
-          <td>
-            <button class="btn-delete" (click)="deletarMatricula(matricula.id, $event)" title="Remover Matrícula">
-              Remover
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="matriculas.length === 0">
-          <td colspan="7" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th (click)="sortBy('id')">Nº Matrícula {{ sortColumn === 'id' ? (sortAscending ? '▲' : '▼') : '' }}</th>
+            <th (click)="sortBy('programaAulaNome')">Programa de Aula {{ sortColumn === 'programaAulaNome' ? (sortAscending ? '▲' : '▼') : '' }}</th>
+            <th (click)="sortBy('data')">Data de Matrícula {{ sortColumn === 'data' ? (sortAscending ? '▲' : '▼') : '' }}</th>
+            <th>Valor</th>
+            <th>Mensalidade</th>
+            <th (click)="sortBy('diaVencimento')">Vencimento {{ sortColumn === 'diaVencimento' ? (sortAscending ? '▲' : '▼') : '' }}</th>
+            <th>Ativo</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let matricula of matriculas" (click)="openEditarMatriculaModal(matricula)">
+            <td>{{ formatMatriculaId(matricula.id) }}</td>
+            <td>{{ matricula.programaAulaNome }}</td>
+            <td>{{ matricula.data | date:'dd/MM/yyyy' }}</td>
+            <td>{{ matricula.valor ? (matricula.valor | currency:'BRL':'symbol':'1.2-2') : '-' }}</td>
+            <td>{{ matricula.valorMensalidade ? (matricula.valorMensalidade | currency:'BRL':'symbol':'1.2-2') : '-' }}
+            </td>
+            <td>{{ matricula.diaVencimento ? 'Dia ' + matricula.diaVencimento : '-' }}</td>
+            <td>
+              <label class="switch" (click)="$event.stopPropagation()">
+                <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)">
+                <span class="slider round"></span>
+              </label>
+            </td>
+            <td>
+              <button class="btn-delete" (click)="deletarMatricula(matricula.id, $event)" title="Remover Matrícula">
+                Remover
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="matriculas.length === 0">
+            <td colspan="8" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -131,5 +153,33 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal Confirmação de Exclusão -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirmModal" (click)="showDeleteConfirmModal = false">
+  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmar Exclusão</h3>
+      <button type="button" class="btn-close" (click)="showDeleteConfirmModal = false" title="Fechar">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div *ngIf="deleteErrorMessage" class="alert alert-danger">
+        {{ deleteErrorMessage }}
+      </div>
+      <p style="margin: 0; font-size: 1.05rem; color: #333;">
+        Tem certeza que deseja remover esta matrícula? Esta ação não poderá ser desfeita.
+      </p>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger" (click)="confirmarDeletarMatricula()" [disabled]="deleteLoading">
+        {{ deleteLoading ? 'Removendo...' : 'Sim, Remover' }}
+      </button>
+    </div>
   </div>
 </div>

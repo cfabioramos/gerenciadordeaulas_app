@@ -72,4 +72,20 @@ export class GerenciadorAulasService {
   atualizarStatusMatricula(id: number, ativo: boolean): Observable<any> {
     return this.http.patch<any>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, null);
   }
+
+  getPagamentos(alunoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${API_URL}/pagamentos/aluno/${alunoId}`);
+  }
+
+  criarPagamento(pagamento: any): Observable<any> {
+    return this.http.post<any>(`${API_URL}/pagamentos`, pagamento);
+  }
+
+  atualizarPagamento(id: number, pagamento: any): Observable<any> {
+    return this.http.put<any>(`${API_URL}/pagamentos/${id}`, pagamento);
+  }
+
+  deletarPagamento(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/pagamentos/${id}`);
+  }
 }

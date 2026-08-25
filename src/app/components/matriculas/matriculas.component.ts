@@ -3,11 +3,12 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { PagamentosComponent } from '../pagamentos/pagamentos.component';
 
 @Component({
   selector: 'app-matriculas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PagamentosComponent],
   templateUrl: './matriculas.component.html',
   styleUrl: './matriculas.component.css'
 })
@@ -15,6 +16,7 @@ export class MatriculasComponent implements OnInit {
   matriculas: any[] = [];
   alunoId!: number;
   alunoNome: string = '';
+  activeTab: string = 'matriculas'; // Default tab (Matrículas on the left)
 
   // Modal State
   showModal: boolean = false;
@@ -31,6 +33,12 @@ export class MatriculasComponent implements OnInit {
   isEditing: boolean = false;
   editingMatriculaId: number | null = null;
   dataMatricula: string = '';
+  sortColumn: string = 'id';
+  sortAscending: boolean = true;
+  showDeleteConfirmModal: boolean = false;
+  matriculaIdToDelete: number | null = null;
+  deleteErrorMessage: string = '';
+  deleteLoading: boolean = false;
 
   constructor(
     private service: GerenciadorAulasService,
@@ -65,7 +73,8 @@ export class MatriculasComponent implements OnInit {
 
   loadMatriculas() {
     this.service.getMatriculas(this.alunoId).subscribe(data => {
-      this.matriculas = data;
+      this.matriculas = data || [];
+      this.sortData();
     });
   }
 
@@ -180,16 +189,33 @@ export class MatriculasComponent implements OnInit {
 
   deletarMatricula(id: number, event: Event) {
     event.stopPropagation();
-    if (confirm('Tem certeza que deseja remover esta matrícula?')) {
-      this.service.deletarMatricula(id).subscribe({
-        next: () => {
-          this.loadMatriculas();
-        },
-        error: (err) => {
-          console.error('Erro ao deletar matrícula:', err);
+    this.showDeleteConfirmModal = true;
+    this.matriculaIdToDelete = id;
+    this.deleteErrorMessage = '';
+    this.deleteLoading = false;
+  }
+
+  confirmarDeletarMatricula() {
+    if (this.matriculaIdToDelete === null) return;
+    this.deleteLoading = true;
+    this.deleteErrorMessage = '';
+    this.service.deletarMatricula(this.matriculaIdToDelete).subscribe({
+      next: () => {
+        this.deleteLoading = false;
+        this.showDeleteConfirmModal = false;
+        this.matriculaIdToDelete = null;
+        this.loadMatriculas();
+      },
+      error: (err) => {
+        this.deleteLoading = false;
+        if (err.status === 500) {
+          this.deleteErrorMessage = 'Existem presenças associadas a essa matrícula.';
+        } else {
+          this.deleteErrorMessage = 'Erro ao remover matrícula.';
         }
-      });
-    }
+        console.error('Erro ao deletar matrícula:', err);
+      }
+    });
   }
 
   openEditarMatriculaModal(matricula: any) {
@@ -220,5 +246,50 @@ export class MatriculasComponent implements OnInit {
 
   goBack() {
     this.location.back();
+  }
+
+  formatMatriculaId(id: number | null | undefined): string {
+    if (id === null || id === undefined) return '-';
+    return String(id).padStart(5, '0');
+  }
+
+  sortBy(column: string) {
+    if (this.sortColumn === column) {
+      this.sortAscending = !this.sortAscending;
+    } else {
+      this.sortColumn = column;
+      this.sortAscending = true;
+    }
+    this.sortData();
+  }
+
+  sortData() {
+    this.matriculas.sort((a, b) => {
+      let valA: any = a[this.sortColumn];
+      let valB: any = b[this.sortColumn];
+
+      // Handle null/undefined values
+      if (valA === null || valA === undefined) valA = '';
+      if (valB === null || valB === undefined) valB = '';
+
+      if (this.sortColumn === 'data') {
+        const dateA = valA ? new Date(valA).getTime() : 0;
+        const dateB = valB ? new Date(valB).getTime() : 0;
+        return this.sortAscending ? dateA - dateB : dateB - dateA;
+      }
+
+      if (this.sortColumn === 'id' || this.sortColumn === 'diaVencimento') {
+        const numA = Number(valA) || 0;
+        const numB = Number(valB) || 0;
+        return this.sortAscending ? numA - numB : numB - numA;
+      }
+
+      // Default string comparison (e.g. for programaAulaNome)
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+      if (strA < strB) return this.sortAscending ? -1 : 1;
+      if (strA > strB) return this.sortAscending ? 1 : -1;
+      return 0;
+    });
   }
 }

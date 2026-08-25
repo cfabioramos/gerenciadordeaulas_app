@@ -1,0 +1,120 @@
+<div class="actions-header">
+  <button class="btn-primary" (click)="openNovoPagamentoModal()">
+    Novo Pagamento
+  </button>
+</div>
+
+<div class="table-responsive">
+  <table class="list-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Programas Associados (Mensalidade do dia)</th>
+        <th>Desconto (%)</th>
+        <th>Valor Pago</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pagamento of pagamentos" (click)="openEditarPagamentoModal(pagamento, $event)">
+        <td>{{ pagamento.data }}</td>
+        <td>{{ formatProgramas(pagamento.itens) }}</td>
+        <td>{{ getDiscountPercentage(pagamento) }}</td>
+        <td>{{ pagamento.valor ? (pagamento.valor | currency:'BRL':'symbol':'1.2-2') : '-' }}</td>
+        <td>
+          <button class="btn-delete" (click)="deletarPagamento(pagamento.id, $event)" title="Estornar Pagamento">
+            Estornar
+          </button>
+        </td>
+      </tr>
+      <tr *ngIf="pagamentos.length === 0">
+        <td colspan="5" style="text-align: center;">Nenhum pagamento registrado para este aluno.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Novo/Editar Pagamento -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ isEditing ? 'Editar Pagamento' : 'Registrar Pagamento' }}</h3>
+      <button type="button" class="btn-close" (click)="showModal = false" [disabled]="modalLoading" title="Fechar">&times;</button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-group">
+          <label for="inputDataPagamento">Data do Pagamento (dd/MM/yyyy)</label>
+          <input type="text" id="inputDataPagamento" class="form-control" [(ngModel)]="dataPagamento"
+            name="dataPagamento" placeholder="Ex: 25/08/2026" required [disabled]="modalLoading" />
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="inputValor">Valor Pago (R$)</label>
+          <input type="number" id="inputValor" class="form-control" [(ngModel)]="valor"
+            name="valor" placeholder="0,00" min="0.01" step="0.01" required [disabled]="modalLoading" />
+          <div *ngIf="discountInfo" class="discount-info" style="margin-top: 6px; font-size: 0.9rem; color: #64748b; font-weight: 500;">
+            {{ discountInfo }}
+          </div>
+        </div>
+
+        <!-- Selection of Active Matriculas - Only for creation -->
+        <div class="form-group" style="margin-top: 15px;" *ngIf="!isEditing">
+          <label style="font-weight: 600; display: block; margin-bottom: 8px;">Associar a Programas de Aulas Ativos</label>
+          <div *ngIf="activeMatriculas.length === 0" style="color: #666; font-style: italic; font-size: 0.9rem;">
+            Nenhum programa de aula ativo (ciclo vigente) encontrado para este aluno.
+          </div>
+          <div *ngFor="let m of activeMatriculas" class="checkbox-item" style="margin-bottom: 8px; display: flex; align-items: center;">
+            <input type="checkbox" [id]="'chk_' + m.id" [(ngModel)]="selectedMatriculaIds[m.id]"
+              [name]="'chk_' + m.id" (change)="recalculateTotalValue()" [disabled]="modalLoading" style="margin-right: 8px; cursor: pointer;" />
+            <label [for]="'chk_' + m.id" style="cursor: pointer; font-size: 0.95rem; color: #333;">
+              {{ m.programaAulaNome }} (Mensalidade atual: {{ m.valorMensalidade | currency:'BRL':'symbol':'1.2-2' }})
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showModal = false" [disabled]="modalLoading">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+          {{ modalLoading ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Confirmar Pagamento') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Confirmação de Estorno -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirmModal" (click)="showDeleteConfirmModal = false">
+  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmar Estorno</h3>
+      <button type="button" class="btn-close" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading" title="Fechar">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div *ngIf="deleteErrorMessage" class="alert alert-danger">
+        {{ deleteErrorMessage }}
+      </div>
+      <p style="margin: 0; font-size: 1.05rem; color: #333;">
+        Tem certeza que deseja estornar este pagamento? Esta ação removerá o pagamento de todos os programas associados e não poderá ser desfeita.
+      </p>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger" (click)="confirmarDeletarPagamento()" [disabled]="deleteLoading">
+        {{ deleteLoading ? 'Estornando...' : 'Sim, Estornar' }}
+      </button>
+    </div>
+  </div>
+</div>
