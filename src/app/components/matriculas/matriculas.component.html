@@ -17,21 +17,35 @@
         <tr>
           <th>Programa de Aula</th>
           <th>Data de Matrícula</th>
+          <th>Valor</th>
+          <th>Mensalidade</th>
+          <th>Vencimento</th>
+          <th>Ativo</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let matricula of matriculas">
+        <tr *ngFor="let matricula of matriculas" (click)="openEditarMatriculaModal(matricula)">
           <td>{{ matricula.programaAulaNome }}</td>
           <td>{{ matricula.data | date:'dd/MM/yyyy' }}</td>
+          <td>{{ matricula.valor ? (matricula.valor | currency:'BRL':'symbol':'1.2-2') : '-' }}</td>
+          <td>{{ matricula.valorMensalidade ? (matricula.valorMensalidade | currency:'BRL':'symbol':'1.2-2') : '-' }}
+          </td>
+          <td>{{ matricula.diaVencimento ? 'Dia ' + matricula.diaVencimento : '-' }}</td>
           <td>
-            <button class="btn-delete" (click)="deletarMatricula(matricula.id)" title="Remover Matrícula">
+            <label class="switch" (click)="$event.stopPropagation()">
+              <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)">
+              <span class="slider round"></span>
+            </label>
+          </td>
+          <td>
+            <button class="btn-delete" (click)="deletarMatricula(matricula.id, $event)" title="Remover Matrícula">
               Remover
             </button>
           </td>
         </tr>
         <tr *ngIf="matriculas.length === 0">
-          <td colspan="3" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
+          <td colspan="7" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
         </tr>
       </tbody>
     </table>
@@ -42,7 +56,7 @@
 <div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3 class="modal-title">Nova Matrícula</h3>
+      <h3 class="modal-title">{{ isEditing ? 'Editar Matrícula' : 'Nova Matrícula' }}</h3>
       <button type="button" class="btn-close" (click)="showModal = false" title="Fechar">&times;</button>
     </div>
 
@@ -52,38 +66,57 @@
           {{ errorMessage }}
         </div>
 
-        <div class="form-group">
-          <label for="selectCiclo">Ciclo</label>
-          <select
-            id="selectCiclo"
-            class="form-control"
-            [(ngModel)]="selectedCicloId"
-            (change)="onCicloChange()"
-            name="selectedCicloId"
-            required
-          >
-            <option [ngValue]="null" disabled>Selecione um ciclo...</option>
-            <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
-              {{ ciclo.nome }}
-            </option>
-          </select>
+        <div *ngIf="!isEditing">
+          <div class="form-group">
+            <label for="selectCiclo">Ciclo</label>
+            <select id="selectCiclo" class="form-control" [(ngModel)]="selectedCicloId" (change)="onCicloChange()"
+              name="selectedCicloId" required>
+              <option [ngValue]="null" disabled>Selecione um ciclo...</option>
+              <option *ngFor="let ciclo of ciclos" [ngValue]="ciclo.id">
+                {{ ciclo.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="selectPrograma">Programa de Aula</label>
+            <select id="selectPrograma" class="form-control" [(ngModel)]="selectedProgramaId" name="selectedProgramaId"
+              [disabled]="!selectedCicloId || modalLoading" required>
+              <option [ngValue]="null" disabled>
+                {{ selectedCicloId ? 'Selecione um programa...' : 'Selecione um ciclo primeiro' }}
+              </option>
+              <option *ngFor="let prog of programas" [ngValue]="prog.id">
+                {{ prog.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top: 15px;">
+            <label for="inputDataMatricula">Data de Matrícula (dd/MM/aaaa)</label>
+            <input type="text" id="inputDataMatricula" class="form-control" [(ngModel)]="dataMatricula"
+              name="dataMatricula" placeholder="dd/MM/aaaa" required />
+          </div>
         </div>
 
         <div class="form-group" style="margin-top: 15px;">
-          <label for="selectPrograma">Programa de Aula</label>
-          <select
-            id="selectPrograma"
-            class="form-control"
-            [(ngModel)]="selectedProgramaId"
-            name="selectedProgramaId"
-            [disabled]="!selectedCicloId || modalLoading"
-            required
-          >
-            <option [ngValue]="null" disabled>
-              {{ selectedCicloId ? 'Selecione um programa...' : 'Selecione um ciclo primeiro' }}
-            </option>
-            <option *ngFor="let prog of programas" [ngValue]="prog.id">
-              {{ prog.nome }}
+          <label for="inputValor">Valor (R$)</label>
+          <input type="number" id="inputValor" class="form-control" [(ngModel)]="valor" name="valor" placeholder="0.00"
+            min="0" step="0.01" [disabled]="modalLoading" />
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="inputValorMensalidade">Valor da Mensalidade (R$)</label>
+          <input type="number" id="inputValorMensalidade" class="form-control" [(ngModel)]="valorMensalidade"
+            name="valorMensalidade" placeholder="0.00" min="0" step="0.01" [disabled]="modalLoading" />
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="selectDiaVencimento">Dia do Vencimento</label>
+          <select id="selectDiaVencimento" class="form-control" [(ngModel)]="selectedDiaVencimento"
+            name="selectedDiaVencimento" [disabled]="modalLoading">
+            <option [ngValue]="null">Selecione o dia...</option>
+            <option *ngFor="let dia of diasDoMes" [ngValue]="dia">
+              {{ dia }}
             </option>
           </select>
         </div>
@@ -93,8 +126,8 @@
         <button type="button" class="btn btn-secondary" (click)="showModal = false" [disabled]="modalLoading">
           Cancelar
         </button>
-        <button type="submit" class="btn btn-primary" [disabled]="modalLoading || !selectedProgramaId">
-          {{ modalLoading ? 'Salvando...' : 'Confirmar Matrícula' }}
+        <button type="submit" class="btn btn-primary" [disabled]="modalLoading || (!isEditing && !selectedProgramaId)">
+          {{ modalLoading ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Confirmar Matrícula') }}
         </button>
       </div>
     </form>

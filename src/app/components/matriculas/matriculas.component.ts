@@ -24,6 +24,13 @@ export class MatriculasComponent implements OnInit {
   selectedProgramaId: number | null = null;
   modalLoading: boolean = false;
   errorMessage: string = '';
+  valor: number | null = null;
+  valorMensalidade: number | null = null;
+  selectedDiaVencimento: number | null = null;
+  diasDoMes: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
+  isEditing: boolean = false;
+  editingMatriculaId: number | null = null;
+  dataMatricula: string = '';
 
   constructor(
     private service: GerenciadorAulasService,
@@ -63,11 +70,24 @@ export class MatriculasComponent implements OnInit {
   }
 
   openNovaMatriculaModal() {
+    this.isEditing = false;
+    this.editingMatriculaId = null;
     this.showModal = true;
     this.selectedCicloId = null;
     this.selectedProgramaId = null;
     this.programas = [];
     this.errorMessage = '';
+    this.valor = null;
+    this.valorMensalidade = null;
+    this.selectedDiaVencimento = null;
+    
+    // Initialize dataMatricula with today's date in dd/MM/yyyy format
+    const today = new Date();
+    const dayStr = String(today.getDate()).padStart(2, '0');
+    const monthStr = String(today.getMonth() + 1).padStart(2, '0');
+    const yearStr = today.getFullYear();
+    this.dataMatricula = `${dayStr}/${monthStr}/${yearStr}`;
+    
     this.modalLoading = true;
 
     this.service.getCiclos().subscribe({
@@ -103,6 +123,29 @@ export class MatriculasComponent implements OnInit {
   }
 
   salvarMatricula() {
+    if (this.isEditing && this.editingMatriculaId) {
+      this.modalLoading = true;
+      this.errorMessage = '';
+      const payload = {
+        valor: this.valor,
+        valorMensalidade: this.valorMensalidade,
+        diaVencimento: this.selectedDiaVencimento
+      };
+      this.service.atualizarMatricula(this.editingMatriculaId, payload).subscribe({
+        next: () => {
+          this.modalLoading = false;
+          this.showModal = false;
+          this.loadMatriculas();
+        },
+        error: (err) => {
+          this.modalLoading = false;
+          this.errorMessage = 'Erro ao atualizar matrícula.';
+          console.error(err);
+        }
+      });
+      return;
+    }
+
     if (!this.selectedProgramaId) {
       this.errorMessage = 'Por favor, selecione um programa de aula.';
       return;
@@ -111,18 +154,14 @@ export class MatriculasComponent implements OnInit {
     this.modalLoading = true;
     this.errorMessage = '';
 
-    // Formatar data local como YYYY-MM-DD para evitar problemas de fuso horário
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const localDateStr = `${year}-${month}-${day}`;
-
-    // Construir o payload apenas com alunoId, programaAulaId e data
+    // Construir o payload
     const payload = {
       alunoId: this.alunoId,
       programaAulaId: +this.selectedProgramaId,
-      data: localDateStr
+      data: this.dataMatricula,
+      valor: this.valor,
+      valorMensalidade: this.valorMensalidade,
+      diaVencimento: this.selectedDiaVencimento
     };
 
     this.service.criarMatricula(payload).subscribe({
@@ -139,7 +178,8 @@ export class MatriculasComponent implements OnInit {
     });
   }
 
-  deletarMatricula(id: number) {
+  deletarMatricula(id: number, event: Event) {
+    event.stopPropagation();
     if (confirm('Tem certeza que deseja remover esta matrícula?')) {
       this.service.deletarMatricula(id).subscribe({
         next: () => {
@@ -150,6 +190,32 @@ export class MatriculasComponent implements OnInit {
         }
       });
     }
+  }
+
+  openEditarMatriculaModal(matricula: any) {
+    this.isEditing = true;
+    this.editingMatriculaId = matricula.id;
+    this.selectedCicloId = null;
+    this.selectedProgramaId = matricula.programaAulaId;
+    this.valor = matricula.valor;
+    this.valorMensalidade = matricula.valorMensalidade;
+    this.selectedDiaVencimento = matricula.diaVencimento;
+    this.showModal = true;
+    this.errorMessage = '';
+  }
+
+  toggleMatriculaAtiva(matricula: any, event: Event) {
+    event.stopPropagation();
+    const originalState = matricula.flAtivo;
+    this.service.atualizarStatusMatricula(matricula.id, matricula.flAtivo).subscribe({
+      next: () => {
+        // Success
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar status da matrícula:', err);
+        matricula.flAtivo = originalState; // Revert status
+      }
+    });
   }
 
   goBack() {
