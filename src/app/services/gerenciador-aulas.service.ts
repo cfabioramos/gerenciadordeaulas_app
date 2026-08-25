@@ -64,4 +64,12 @@ export class GerenciadorAulasService {
   deletarMatricula(id: number): Observable<any> {
     return this.http.delete<any>(`${API_URL}/matriculas/${id}`);
   }
+
+  atualizarMatricula(id: number, matricula: any): Observable<any> {
+    return this.http.put<any>(`${API_URL}/matriculas/${id}`, matricula);
+  }
+
+  atualizarStatusMatricula(id: number, ativo: boolean): Observable<any> {
+    return this.http.patch<any>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, null);
+  }
 }
