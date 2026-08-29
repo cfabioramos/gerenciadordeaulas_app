@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
 import { NovoAlunoComponent } from './novo-aluno/novo-aluno.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-alunos',
@@ -21,8 +22,13 @@ export class AlunosComponent implements OnInit {
 
   constructor(
     private service: GerenciadorAulasService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   ngOnInit(): void {
     this.loadAlunos();

@@ -1,14 +1,35 @@
-<div class="app-container">
+<div class="app-container" [class.login-layout]="!isLoggedIn()">
+  <!-- Theme Background Illustration Watermark -->
+  <div class="theme-illustration-bg"></div>
+
   <!-- Header -->
-  <header class="app-header">
+  <header class="app-header" *ngIf="isLoggedIn()">
     <div class="header-content">
       <h1>Meu Gerenciador de Presenças</h1>
+      <div class="user-info">
+        <div class="theme-selector-container">
+          <label class="theme-label" for="headerThemeSelect">Tema:</label>
+          <select id="headerThemeSelect" class="theme-select" [value]="currentTheme" (change)="onThemeChange($event)">
+            <option value="nordeste">Nordeste</option>
+            <option value="dancacircular">Dança Circular</option>
+            <option value="forro">Forró</option>
+            <option value="frevo">Frevo</option>
+          </select>
+        </div>
+        <span class="user-name">Olá, {{ getUserNome() }}</span>
+        <button class="btn-logout" (click)="logout()">Sair</button>
+      </div>
     </div>
   </header>
 
   <div class="main-wrapper">
     <!-- Menu Sidebar -->
-    <aside class="app-sidebar">
+    <aside class="app-sidebar" *ngIf="isLoggedIn()">
+      <!-- Cheerful Sidebar Banner -->
+      <div class="sidebar-theme-banner">
+        <div class="sidebar-theme-graphic"></div>
+      </div>
+
       <nav class="nav-menu">
         <a routerLink="/ciclos" routerLinkActive="active" class="nav-item">
           <span class="icon">📅</span>
@@ -32,7 +53,7 @@
   </div>
 
   <!-- Footer -->
-  <footer class="app-footer">
+  <footer class="app-footer" *ngIf="isLoggedIn()">
     <div class="footer-left">
       <a href="https://instagram.com/marcosaffonso" target="_blank" rel="noopener">&#64;marcosaffonso</a>
     </div>
@@ -40,7 +61,7 @@
       Powered by Ziriguidum
     </div>
     <div class="footer-right">
-      <span class="signature">Carlos Fábio R</span>
+      <span class="signature"><a href="https://instagram.com/fabinhoforrozeiro" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">&#64;fabinhoforrozeiro</a></span>
     </div>
   </footer>
 </div>

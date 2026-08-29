@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-aulas',
@@ -22,8 +23,25 @@ export class AulasComponent implements OnInit {
   cicloNome: string = '';
   programaNome: string = '';
 
+  // Modals state
+  showModal: boolean = false;
+  modalLoading: boolean = false;
+  errorMessage: string = '';
+
+  nome: string = '';
+  data: string = '';
+
+  isEditing: boolean = false;
+  editingAulaId: number | null = null;
+
+  showDeleteConfirmModal: boolean = false;
+  aulaIdToDelete: number | null = null;
+  deleteErrorMessage: string = '';
+  deleteLoading: boolean = false;
+
   constructor(
     private service: GerenciadorAulasService,
+    private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
     private location: Location
@@ -53,6 +71,10 @@ export class AulasComponent implements OnInit {
     });
   }
 
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
   loadProgramaInfo() {
     if (!this.programaId) return;
     this.service.getProgramaAulas().subscribe({
@@ -75,7 +97,7 @@ export class AulasComponent implements OnInit {
 
   loadAulas() {
     this.service.getAulas(this.programaId || undefined).subscribe(data => {
-      this.aulas = data;
+      this.aulas = data || [];
       this.applyFilter();
     });
   }
@@ -131,9 +153,12 @@ export class AulasComponent implements OnInit {
     const diaNumero = d.getDate();
     const mesExtenso = meses[d.getMonth()];
 
-    return `${diaSemana}, dia ${diaNumero} de ${mesExtenso}`;
-  }
+    // Format hour and minute
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
 
+    return `${diaSemana}, dia ${diaNumero} de ${mesExtenso} às ${hours}:${minutes}`;
+  }
 
   selectAula(aula: any) {
     this.router.navigate(['/aulas', aula.id, 'presencas'], {
@@ -144,6 +169,113 @@ export class AulasComponent implements OnInit {
         programaNome: this.programaNome,
         aulaId: aula.id,
         aulaNome: aula.nome
+      }
+    });
+  }
+
+  openNovaAulaModal() {
+    if (!this.isAdmin) return;
+    this.isEditing = false;
+    this.editingAulaId = null;
+    this.nome = '';
+    
+    // Default data field to current date/time in YYYY-MM-DDTHH:mm format
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000;
+    const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 16);
+    this.data = localISOTime;
+    
+    this.errorMessage = '';
+    this.showModal = true;
+  }
+
+  openEditarAulaModal(aula: any, event: Event) {
+    event.stopPropagation();
+    if (!this.isAdmin) return;
+    this.isEditing = true;
+    this.editingAulaId = aula.id;
+    this.nome = aula.nome;
+    this.data = aula.data ? aula.data.substring(0, 16) : '';
+    this.errorMessage = '';
+    this.showModal = true;
+  }
+
+  onSubmit() {
+    if (!this.nome || !this.data) {
+      this.errorMessage = 'Por favor, preencha todos os campos obrigatórios.';
+      return;
+    }
+
+    if (!this.programaId) {
+      this.errorMessage = 'Identificador de programa de aula inválido.';
+      return;
+    }
+
+    this.modalLoading = true;
+    this.errorMessage = '';
+
+    // Append seconds to match LocalDateTime expected format
+    const formattedDateTime = this.data.length === 16 ? `${this.data}:00` : this.data;
+
+    const payload = {
+      nome: this.nome.trim(),
+      data: formattedDateTime,
+      programaAula: { id: this.programaId }
+    };
+
+    if (this.isEditing) {
+      this.service.atualizarAula(this.editingAulaId!, payload).subscribe({
+        next: () => {
+          this.modalLoading = false;
+          this.showModal = false;
+          this.loadAulas();
+        },
+        error: (err) => {
+          this.modalLoading = false;
+          this.errorMessage = 'Erro ao atualizar aula.';
+          console.error(err);
+        }
+      });
+    } else {
+      this.service.criarAula(payload).subscribe({
+        next: () => {
+          this.modalLoading = false;
+          this.showModal = false;
+          this.loadAulas();
+        },
+        error: (err) => {
+          this.modalLoading = false;
+          this.errorMessage = 'Erro ao criar aula.';
+          console.error(err);
+        }
+      });
+    }
+  }
+
+  openDeletarAulaModal(id: number, event: Event) {
+    event.stopPropagation();
+    if (!this.isAdmin) return;
+    this.aulaIdToDelete = id;
+    this.deleteErrorMessage = '';
+    this.deleteLoading = false;
+    this.showDeleteConfirmModal = true;
+  }
+
+  confirmarDeletarAula() {
+    if (this.aulaIdToDelete === null) return;
+    this.deleteLoading = true;
+    this.deleteErrorMessage = '';
+    this.service.deletarAula(this.aulaIdToDelete).subscribe({
+      next: () => {
+        this.deleteLoading = false;
+        this.showDeleteConfirmModal = false;
+        this.aulaIdToDelete = null;
+        this.loadAulas();
+      },
+      error: (err) => {
+        this.deleteLoading = false;
+        this.deleteErrorMessage = 'Erro ao excluir aula. Verifique se existem presenças cadastradas nesta aula.';
+        console.error(err);
       }
     });
   }

@@ -9,12 +9,20 @@
   </div>
 
   <div class="tabs-nav">
+    <button class="tab-btn" [class.active]="activeTab === 'detalhes'" (click)="activeTab = 'detalhes'">
+      Detalhes
+    </button>
     <button class="tab-btn" [class.active]="activeTab === 'matriculas'" (click)="activeTab = 'matriculas'">
       Matrículas
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'pagamentos'" (click)="activeTab = 'pagamentos'">
       Pagamentos
     </button>
+  </div>
+
+  <!-- Detalhes Tab -->
+  <div *ngIf="activeTab === 'detalhes'">
+    <app-detalhes [alunoId]="alunoId" (alunoAtualizado)="onAlunoAtualizado($event)"></app-detalhes>
   </div>
 
   <!-- Pagamentos Tab -->
@@ -24,7 +32,7 @@
 
   <!-- Matrículas Tab -->
   <div *ngIf="activeTab === 'matriculas'">
-    <div class="actions-header">
+    <div class="actions-header" *ngIf="isAdmin">
       <button class="btn-add-matricula" (click)="openNovaMatriculaModal()" title="Nova Matrícula">
         + Nova Matrícula
       </button>
@@ -41,11 +49,11 @@
             <th>Mensalidade</th>
             <th (click)="sortBy('diaVencimento')">Vencimento {{ sortColumn === 'diaVencimento' ? (sortAscending ? '▲' : '▼') : '' }}</th>
             <th>Ativo</th>
-            <th>Ações</th>
+            <th *ngIf="isAdmin">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let matricula of matriculas" (click)="openEditarMatriculaModal(matricula)">
+          <tr *ngFor="let matricula of matriculas" (click)="openEditarMatriculaModal(matricula)" [style.cursor]="isAdmin ? 'pointer' : 'default'">
             <td>{{ formatMatriculaId(matricula.id) }}</td>
             <td>{{ matricula.programaAulaNome }}</td>
             <td>{{ matricula.data | date:'dd/MM/yyyy' }}</td>
@@ -55,18 +63,18 @@
             <td>{{ matricula.diaVencimento ? 'Dia ' + matricula.diaVencimento : '-' }}</td>
             <td>
               <label class="switch" (click)="$event.stopPropagation()">
-                <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)">
+                <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)" [disabled]="!isAdmin">
                 <span class="slider round"></span>
               </label>
             </td>
-            <td>
+            <td *ngIf="isAdmin">
               <button class="btn-delete" (click)="deletarMatricula(matricula.id, $event)" title="Remover Matrícula">
                 Remover
               </button>
             </td>
           </tr>
           <tr *ngIf="matriculas.length === 0">
-            <td colspan="8" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
+            <td [attr.colspan]="isAdmin ? 8 : 7" style="text-align: center;">Nenhuma matrícula encontrada para este aluno.</td>
           </tr>
         </tbody>
       </table>

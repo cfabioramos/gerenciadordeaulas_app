@@ -43,7 +43,8 @@
                 type="checkbox" 
                 [checked]="matricula.presente" 
                 [(ngModel)]="matricula.presente" 
-                (change)="onTogglePresenca(matricula, $event)">
+                (change)="onTogglePresenca(matricula, $event)"
+                [disabled]="!isAdmin">
               <span class="slider round"></span>
             </label>
           </td>

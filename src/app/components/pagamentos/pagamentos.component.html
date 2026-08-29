@@ -1,4 +1,4 @@
-<div class="actions-header">
+<div class="actions-header" *ngIf="isAdmin">
   <button class="btn-primary" (click)="openNovoPagamentoModal()">
     Novo Pagamento
   </button>
@@ -12,23 +12,23 @@
         <th>Programas Associados (Mensalidade do dia)</th>
         <th>Desconto (%)</th>
         <th>Valor Pago</th>
-        <th>Ações</th>
+        <th *ngIf="isAdmin">Ações</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let pagamento of pagamentos" (click)="openEditarPagamentoModal(pagamento, $event)">
+      <tr *ngFor="let pagamento of pagamentos" (click)="openEditarPagamentoModal(pagamento, $event)" [style.cursor]="isAdmin ? 'pointer' : 'default'">
         <td>{{ pagamento.data }}</td>
         <td>{{ formatProgramas(pagamento.itens) }}</td>
         <td>{{ getDiscountPercentage(pagamento) }}</td>
         <td>{{ pagamento.valor ? (pagamento.valor | currency:'BRL':'symbol':'1.2-2') : '-' }}</td>
-        <td>
+        <td *ngIf="isAdmin">
           <button class="btn-delete" (click)="deletarPagamento(pagamento.id, $event)" title="Estornar Pagamento">
             Estornar
           </button>
         </td>
       </tr>
       <tr *ngIf="pagamentos.length === 0">
-        <td colspan="5" style="text-align: center;">Nenhum pagamento registrado para este aluno.</td>
+        <td [attr.colspan]="isAdmin ? 5 : 4" style="text-align: center;">Nenhum pagamento registrado para este aluno.</td>
       </tr>
     </tbody>
   </table>

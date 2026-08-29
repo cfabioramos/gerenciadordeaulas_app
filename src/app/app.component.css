@@ -153,3 +153,79 @@
   .app-footer { padding: 0 10px; font-size: 0.75rem; height: 40px; }
   .footer-right .signature { font-size: 0.9rem; }
 }
+
+/* User Info and Logout in Header */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.btn-logout {
+  padding: 5px 12px;
+  background-color: transparent;
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--text-light);
+}
+
+.login-layout .app-content {
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.sidebar-theme-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar-theme-graphic {
+  width: 40px;
+  height: 40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: all 0.3s ease;
+}
+
+.app-sidebar:hover .sidebar-theme-graphic {
+  width: 120px;
+  height: 120px;
+}
+
+@media (max-width: 768px) {
+  .sidebar-theme-banner {
+    display: none;
+  }
+}

@@ -49,8 +49,16 @@ export class GerenciadorAulasService {
     return this.http.get<any[]>(`${API_URL}/alunos`);
   }
 
+  getAlunoPorId(id: number): Observable<any> {
+    return this.http.get<any>(`${API_URL}/alunos/${id}`);
+  }
+
   criarAluno(aluno: { nome: string }): Observable<any> {
     return this.http.post<any>(`${API_URL}/alunos`, aluno);
+  }
+
+  atualizarAluno(id: number, aluno: { nome: string }): Observable<any> {
+    return this.http.put<any>(`${API_URL}/alunos/${id}`, aluno);
   }
 
   getMatriculas(alunoId: number): Observable<any[]> {
@@ -87,5 +95,48 @@ export class GerenciadorAulasService {
 
   deletarPagamento(id: number): Observable<any> {
     return this.http.delete<any>(`${API_URL}/pagamentos/${id}`);
+  }
+
+  // Ciclos CRUD
+  criarCiclo(ciclo: any): Observable<any> {
+    return this.http.post<any>(`${API_URL}/ciclos`, ciclo);
+  }
+
+  atualizarCiclo(id: number, ciclo: any): Observable<any> {
+    return this.http.put<any>(`${API_URL}/ciclos/${id}`, ciclo);
+  }
+
+  deletarCiclo(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/ciclos/${id}`);
+  }
+
+  // Programas de Aulas CRUD
+  getTipoAulas(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_URL}/tipo-aulas`);
+  }
+
+  criarProgramaAula(programa: any): Observable<any> {
+    return this.http.post<any>(`${API_URL}/programa-aulas`, programa);
+  }
+
+  atualizarProgramaAula(id: number, programa: any): Observable<any> {
+    return this.http.put<any>(`${API_URL}/programa-aulas/${id}`, programa);
+  }
+
+  deletarProgramaAula(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/programa-aulas/${id}`);
+  }
+
+  // Aulas CRUD
+  criarAula(aula: any): Observable<any> {
+    return this.http.post<any>(`${API_URL}/aulas`, aula);
+  }
+
+  atualizarAula(id: number, aula: any): Observable<any> {
+    return this.http.put<any>(`${API_URL}/aulas/${id}`, aula);
+  }
+
+  deletarAula(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_URL}/aulas/${id}`);
   }
 }

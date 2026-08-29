@@ -1,0 +1,33 @@
+<div class="detalhes-container">
+  <form (ngSubmit)="salvar()">
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <div class="form-group">
+      <label for="nomeAluno">Nome do Aluno</label>
+      <input
+        id="nomeAluno"
+        type="text"
+        class="form-control"
+        [(ngModel)]="alunoNome"
+        name="nome"
+        [disabled]="loading || !isAdmin"
+        required
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="form-actions" *ngIf="isAdmin">
+      <button type="submit" class="btn btn-primary" [disabled]="loading || !alunoNome.trim() || alunoNome.trim() === originalNome">
+        {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="loading || alunoNome === originalNome">
+        Descartar
+      </button>
+    </div>
+  </form>
+</div>

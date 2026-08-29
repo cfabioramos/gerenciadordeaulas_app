@@ -6,6 +6,9 @@
       <button (click)="toggleSort()">
         Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
       </button>
+      <button class="btn-primary" (click)="openNovoCicloModal()" *ngIf="isAdmin" style="margin-left: 5px;">
+        + Novo Ciclo
+      </button>
     </div>
   </div>
 
@@ -16,6 +19,7 @@
           <th (click)="toggleSort()">Nome</th>
           <th>Data Início</th>
           <th>Data Fim</th>
+          <th *ngIf="isAdmin">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -23,11 +27,94 @@
           <td>{{ ciclo.nome }}</td>
           <td>{{ ciclo.dataInicio | date:'dd/MM/yyyy' }}</td>
           <td>{{ ciclo.dataFim | date:'dd/MM/yyyy' }}</td>
+          <td *ngIf="isAdmin" (click)="$event.stopPropagation()">
+            <button class="btn-edit" (click)="openEditarCicloModal(ciclo, $event)" title="Editar Ciclo"
+              style="margin-right: 6px; padding: 5px 10px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Editar
+            </button>
+            <button class="btn-delete" (click)="openDeletarCicloModal(ciclo.id, $event)" title="Excluir Ciclo"
+              style="padding: 5px 10px; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Excluir
+            </button>
+          </td>
         </tr>
         <tr *ngIf="filteredCiclos.length === 0">
-          <td colspan="3" style="text-align: center;">Nenhum ciclo encontrado.</td>
+          <td [attr.colspan]="isAdmin ? 4 : 3" style="text-align: center;">Nenhum ciclo encontrado.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modal Novo/Editar Ciclo -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ isEditing ? 'Editar Ciclo' : 'Cadastrar Ciclo' }}</h3>
+      <button type="button" class="btn-close" (click)="showModal = false" [disabled]="modalLoading" title="Fechar">&times;</button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-group">
+          <label for="inputNome">Nome do Ciclo</label>
+          <input type="text" id="inputNome" class="form-control" [(ngModel)]="nome"
+            name="nome" placeholder="Ex: 3/2026 UFBA" required [disabled]="modalLoading" />
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="inputDataInicio">Data de Início</label>
+          <input type="date" id="inputDataInicio" class="form-control" [(ngModel)]="dataInicio"
+            name="dataInicio" required [disabled]="modalLoading" />
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label for="inputDataFim">Data de Fim</label>
+          <input type="date" id="inputDataFim" class="form-control" [(ngModel)]="dataFim"
+            name="dataFim" required [disabled]="modalLoading" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showModal = false" [disabled]="modalLoading">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+          {{ modalLoading ? 'Salvando...' : (isEditing ? 'Salvar Alterações' : 'Cadastrar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Confirmação de Exclusão -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirmModal" (click)="showDeleteConfirmModal = false">
+  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Confirmar Exclusão</h3>
+      <button type="button" class="btn-close" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading" title="Fechar">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div *ngIf="deleteErrorMessage" class="alert alert-danger">
+        {{ deleteErrorMessage }}
+      </div>
+      <p style="margin: 0; font-size: 1.05rem; color: #333;">
+        Tem certeza que deseja excluir este ciclo? Esta ação removerá permanentemente o ciclo, todos os programas e aulas associados, e não poderá ser desfeita.
+      </p>
+    </div>
+    
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger" (click)="confirmarDeletarCiclo()" [disabled]="deleteLoading">
+        {{ deleteLoading ? 'Excluindo...' : 'Sim, Excluir' }}
+      </button>
+    </div>
   </div>
 </div>
