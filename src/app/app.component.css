@@ -119,7 +119,33 @@
 
 @media (max-width: 768px) {
   .app-header { height: 50px; }
-  .header-content h1 { font-size: 1.1rem; }
+  .header-content h1 { display: none; }
+  .header-content {
+    justify-content: center;
+    padding: 0 10px;
+  }
+  .user-info {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .theme-selector-container {
+    margin-right: 0;
+  }
+  .theme-label {
+    font-size: 0.75rem;
+  }
+  .theme-select {
+    padding: 3px 6px;
+    font-size: 0.75rem;
+  }
+  .user-name {
+    font-size: 0.8rem;
+  }
+  .btn-logout {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+  }
   .main-wrapper { flex-direction: column; }
   .app-sidebar {
     position: relative;
