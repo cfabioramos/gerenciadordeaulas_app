@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
 import { PagamentosComponent } from '../pagamentos/pagamentos.component';
+import { DetalhesComponent } from '../alunos/detalhes/detalhes.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-matriculas',
   standalone: true,
-  imports: [CommonModule, FormsModule, PagamentosComponent],
+  imports: [CommonModule, FormsModule, PagamentosComponent, DetalhesComponent],
   templateUrl: './matriculas.component.html',
   styleUrl: './matriculas.component.css'
 })
@@ -16,7 +18,7 @@ export class MatriculasComponent implements OnInit {
   matriculas: any[] = [];
   alunoId!: number;
   alunoNome: string = '';
-  activeTab: string = 'matriculas'; // Default tab (Matrículas on the left)
+  activeTab: string = 'detalhes'; // Default tab (Detalhes on the left)
 
   // Modal State
   showModal: boolean = false;
@@ -43,8 +45,13 @@ export class MatriculasComponent implements OnInit {
   constructor(
     private service: GerenciadorAulasService,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private authService: AuthService
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -219,6 +226,7 @@ export class MatriculasComponent implements OnInit {
   }
 
   openEditarMatriculaModal(matricula: any) {
+    if (!this.isAdmin) return;
     this.isEditing = true;
     this.editingMatriculaId = matricula.id;
     this.selectedCicloId = null;
@@ -232,6 +240,7 @@ export class MatriculasComponent implements OnInit {
 
   toggleMatriculaAtiva(matricula: any, event: Event) {
     event.stopPropagation();
+    if (!this.isAdmin) return;
     const originalState = matricula.flAtivo;
     this.service.atualizarStatusMatricula(matricula.id, matricula.flAtivo).subscribe({
       next: () => {
@@ -291,5 +300,11 @@ export class MatriculasComponent implements OnInit {
       if (strA > strB) return this.sortAscending ? 1 : -1;
       return 0;
     });
+  }
+
+  onAlunoAtualizado(aluno: any) {
+    if (aluno && aluno.nome) {
+      this.alunoNome = aluno.nome;
+    }
   }
 }

@@ -2,6 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-pagamentos',
@@ -32,7 +33,14 @@ export class PagamentosComponent implements OnInit, OnChanges {
   deleteErrorMessage: string = '';
   deleteLoading: boolean = false;
 
-  constructor(private service: GerenciadorAulasService) {}
+  constructor(
+    private service: GerenciadorAulasService,
+    private authService: AuthService
+  ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   ngOnInit(): void {
     if (this.alunoId) {
@@ -118,6 +126,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
 
   openEditarPagamentoModal(pagamento: any, event: Event) {
     event.stopPropagation();
+    if (!this.isAdmin) return;
     this.isEditing = true;
     this.editingPagamentoId = pagamento.id;
     this.valor = pagamento.valor;

@@ -9,6 +9,188 @@
   --menu-collapsed-width: 60px;
 }
 
+/* ==========================================================================
+   TEMAS (Look & Feels)
+   ========================================================================== */
+
+/* 1. NORDESTE (Earthy warm colors, default) */
+body.theme-nordeste {
+  --primary: #957D6A;
+  --primary-light: #b09987;
+  --footer-bg: #E0DDDC;
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  background-color: #f9f9f9;
+}
+
+/* 2. DANÇA CIRCULAR (Mystical Indigo & Lavender - Dark Theme) */
+body.theme-dancacircular {
+  --primary: #c084fc; /* soft violet */
+  --primary-light: #e9d5ff;
+  --footer-bg: #1e1b4b; /* deep indigo */
+  --text-dark: #f3e8ff; /* violet-50 */
+  --text-light: #1e1b4b; /* text color on light buttons */
+  background-color: #0f0b29; /* cosmic violet-black */
+  color: #f3e8ff;
+}
+
+/* Overrides para tema escuro Dança Circular */
+body.theme-dancacircular .app-content,
+body.theme-dancacircular .list-container,
+body.theme-dancacircular .main-content {
+  background-color: #0f0b29 !important;
+  color: #f3e8ff !important;
+}
+
+body.theme-dancacircular .table-responsive,
+body.theme-dancacircular .list-table,
+body.theme-dancacircular .modal-content,
+body.theme-dancacircular .login-card,
+body.theme-dancacircular .detalhes-container {
+  background-color: #1a103c !important;
+  color: #f3e8ff !important;
+  border-color: #3b2c6f !important;
+}
+
+body.theme-dancacircular .list-table th {
+  background-color: #2b1f5c !important;
+  color: #e9d5ff !important;
+}
+
+body.theme-dancacircular .list-table td {
+  border-bottom: 1px solid #3b2c6f !important;
+  color: #f3e8ff !important;
+}
+
+body.theme-dancacircular .list-table tr:hover {
+  background-color: #3b2c6f !important;
+}
+
+body.theme-dancacircular .form-control {
+  background-color: #0f0b29 !important;
+  color: #f3e8ff !important;
+  border-color: #3b2c6f !important;
+}
+
+body.theme-dancacircular .form-control:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.25) !important;
+}
+
+body.theme-dancacircular .form-group label {
+  color: #e9d5ff !important;
+}
+
+body.theme-dancacircular .modal-header,
+body.theme-dancacircular .modal-footer {
+  border-color: #3b2c6f !important;
+  background-color: #1a103c !important;
+}
+
+body.theme-dancacircular .btn-secondary {
+  background-color: #2b1f5c !important;
+  color: #e9d5ff !important;
+  border-color: #3b2c6f !important;
+}
+
+body.theme-dancacircular .btn-secondary:hover:not(:disabled) {
+  background-color: #3b2c6f !important;
+}
+
+body.theme-dancacircular .btn-close {
+  color: #c084fc !important;
+}
+
+body.theme-dancacircular .alert-danger {
+  background-color: #5c0f1d !important;
+  border-color: #8c0c1b !important;
+  color: #fecdd3 !important;
+}
+
+body.theme-dancacircular .alert-success {
+  background-color: #064e3b !important;
+  border-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+body.theme-dancacircular .btn-primary {
+  color: #1e1b4b !important; /* contrast */
+}
+
+/* 3. FORRÓ (Rustic wood and cozy sunset warm light theme) */
+body.theme-forro {
+  --primary: #d97706; /* warm amber/orange */
+  --primary-light: #f59e0b;
+  --footer-bg: #fef3c7;
+  --text-dark: #451a03;
+  --text-light: #ffffff;
+  background-color: #fffbeb;
+}
+
+/* 4. FREVO (High-energy vibrant red/yellow/blue carnival light theme) */
+body.theme-frevo {
+  --primary: #e11d48; /* Frevo Rose Red */
+  --primary-light: #f59e0b; /* Golden Yellow */
+  --footer-bg: #fee2e2;
+  --text-dark: #0f172a;
+  --text-light: #ffffff;
+  background-color: #fefefe;
+}
+
+body.theme-frevo .list-title {
+  color: #e11d48;
+}
+
+body.theme-frevo .btn-primary,
+body.theme-frevo .btn-add,
+body.theme-frevo .btn-add-matricula {
+  background: linear-gradient(135deg, #e11d48 0%, #f59e0b 100%) !important;
+  border: none !important;
+}
+
+/* Unified dropdown select styling for theme switcher */
+.theme-selector-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 15px;
+}
+
+.theme-label {
+  font-size: 0.85rem;
+  color: inherit;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.theme-select {
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.theme-select:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-select option {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+body.theme-dancacircular .theme-select option {
+  background-color: #1a103c;
+  color: #f3e8ff;
+}
+
+
 * {
   margin: 0;
   padding: 0;
@@ -236,4 +418,322 @@ body {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================================================
+   ILUSTRAÇÕES E MARCAS D'ÁGUA DE TEMAS (Look & Feels)
+   ========================================================================== */
+
+.theme-illustration-bg {
+  position: absolute;
+  bottom: 60px; /* Acima do footer de 50px */
+  right: 20px;
+  width: 180px;
+  height: 180px;
+  opacity: 0.22; /* Marca d'água mais aparente e alegre */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none; /* Permite cliques através da imagem */
+  z-index: 0;
+  transition: background-image 0.4s ease, opacity 0.4s ease;
+}
+
+/* 1. ANIMAÇÕES ALEGRES E DINÂMICAS */
+@keyframes pulse-slow {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes swing {
+  0% { transform: rotate(-8deg); }
+  100% { transform: rotate(8deg); }
+}
+
+@keyframes bounce-joy {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(0.97); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* 2. LAYOUT DA TELA DE LOGIN (Autenticação leve e bonita) */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+body.theme-dancacircular .login-card {
+  background: #150d30;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.login-brand-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: var(--footer-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px auto;
+  transition: background-color 0.4s ease;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+body.theme-dancacircular .login-brand-circle {
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.login-brand-graphic {
+  width: 60px;
+  height: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: background-image 0.4s ease;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 6px 0;
+  transition: color 0.4s ease;
+}
+
+.login-header p {
+  font-size: 0.9rem;
+  color: #718096;
+  margin: 0;
+}
+
+body.theme-dancacircular .login-header p {
+  color: #a0aec0;
+}
+
+/* 3. ASSOCIAÇÃO DE IMAGENS E ANIMAÇÕES POR TEMA */
+
+/* Nordeste: Mandacaru & Sol (Pulsante) */
+body.theme-nordeste .theme-illustration-bg {
+  background-image: url('/images/nordeste.jpg');
+}
+body.theme-nordeste .login-brand-graphic,
+body.theme-nordeste .sidebar-theme-graphic {
+  background-image: url('/images/nordeste.jpg');
+  animation: pulse-slow 4s ease-in-out infinite alternate;
+}
+
+/* Dança Circular: Mandala Sagrada (Giratória) */
+body.theme-dancacircular .theme-illustration-bg {
+  background-image: url('/images/dancacircular.jpg');
+  opacity: 0.08; /* sutil no fundo escuro */
+}
+body.theme-dancacircular .login-brand-graphic,
+body.theme-dancacircular .sidebar-theme-graphic {
+  background-image: url('/images/dancacircular.jpg');
+  animation: spin-slow 20s linear infinite;
+}
+
+/* Forró: Sanfona e Triângulo (Balanço) */
+body.theme-forro .theme-illustration-bg {
+  background-image: url('/images/forro.jpg');
+}
+body.theme-forro .login-brand-graphic,
+body.theme-forro .sidebar-theme-graphic {
+  background-image: url('/images/forro.jpg');
+  animation: swing 4s ease-in-out infinite alternate;
+}
+
+/* Frevo: Guarda-chuva de Frevo (Pulo/Balanço alegre) */
+body.theme-frevo .theme-illustration-bg {
+  background-image: url('/images/frevo.jpg');
+}
+body.theme-frevo .login-brand-graphic,
+body.theme-frevo .sidebar-theme-graphic {
+  background-image: url('/images/frevo.jpg');
+  animation: bounce-joy 3s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
+   UNIFIED MODALS AND FORMS (Global styles for consistent layout and look)
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 460px;
+  overflow: hidden;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eeeeee;
+  background-color: #fcfcfc;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary, #957D6A);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #888888;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #333333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #eeeeee;
+  background-color: #fcfcfc;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  color: #2d3748;
+}
+
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(149, 125, 106, 0.15);
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.alert-danger {
+  background-color: #fff5f5;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+}
+
+/* Modal theme specific colors */
+body.theme-dancacircular .modal-content {
+  background: #150d30;
+  color: #f3e8ff;
+}
+
+body.theme-dancacircular .modal-header,
+body.theme-dancacircular .modal-footer {
+  background-color: #1e1342;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.theme-dancacircular .form-control {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f3e8ff;
+}
+
+body.theme-dancacircular .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.15);
+}
+
+body.theme-dancacircular .form-group label {
+  color: #d6bcfa;
+}
+
+body.theme-dancacircular .btn-close {
+  color: #a0aec0;
+}
+
+body.theme-dancacircular .btn-close:hover {
+  color: #f3e8ff;
+}
+
+
 

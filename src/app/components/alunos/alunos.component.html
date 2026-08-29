@@ -6,7 +6,7 @@
       <button (click)="toggleSort()">
         Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
       </button>
-      <button class="btn-add" (click)="showNovoAlunoModal = true" title="Cadastrar Aluno">
+      <button *ngIf="isAdmin" class="btn-add" (click)="showNovoAlunoModal = true" title="Cadastrar Aluno">
         +
       </button>
     </div>

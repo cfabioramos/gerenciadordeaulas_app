@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { AuthService } from '../../services/auth.service';
 
 export interface Matricula {
   alunoId: number;
@@ -39,7 +40,8 @@ export class PresencaComponent implements OnInit {
     private service: GerenciadorAulasService,
     private route: ActivatedRoute,
     private location: Location,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras.state) {
@@ -57,6 +59,10 @@ export class PresencaComponent implements OnInit {
       this.aulaId = history.state['aulaId'] || null;
       this.aulaNome = history.state['aulaNome'] || '';
     }
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
   }
 
   ngOnInit(): void {
@@ -100,6 +106,7 @@ export class PresencaComponent implements OnInit {
   }
 
   onTogglePresenca(matricula: Matricula, event?: Event) {
+    if (!this.isAdmin) return;
     if (event && event.target) {
       matricula.presente = (event.target as HTMLInputElement).checked;
     }
