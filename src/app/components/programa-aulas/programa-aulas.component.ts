@@ -236,7 +236,7 @@ export class ProgramaAulasComponent implements OnInit {
       },
       error: (err) => {
         this.deleteLoading = false;
-        this.deleteErrorMessage = 'Erro ao excluir programa de aulas. Verifique se existem matrículas ou aulas vinculadas.';
+        this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir o programa de aulas pois existem aulas vinculadas a ele.';
         console.error(err);
       }
     });

@@ -274,7 +274,7 @@ export class AulasComponent implements OnInit {
       },
       error: (err) => {
         this.deleteLoading = false;
-        this.deleteErrorMessage = 'Erro ao excluir aula. Verifique se existem presenças cadastradas nesta aula.';
+        this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir a aula pois existem presenças registradas.';
         console.error(err);
       }
     });

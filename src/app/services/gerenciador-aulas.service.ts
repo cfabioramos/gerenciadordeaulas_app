@@ -78,7 +78,7 @@ export class GerenciadorAulasService {
   }
 
   atualizarStatusMatricula(id: number, ativo: boolean): Observable<any> {
-    return this.http.patch<any>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, null);
+    return this.http.put<any>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, { ativo });
   }
 
   getPagamentos(alunoId: number): Observable<any[]> {

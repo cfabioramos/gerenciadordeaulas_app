@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { API_URL } from './gerenciador-aulas.service';
 
 @Injectable({
@@ -10,6 +10,8 @@ import { API_URL } from './gerenciador-aulas.service';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+
+  public themeChange$ = new BehaviorSubject<string>(localStorage.getItem('theme') || 'nordeste');
 
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${API_URL}/auth/login`, credentials).pipe(
@@ -75,6 +77,7 @@ export class AuthService {
     // Remove any theme class
     body.className = body.className.split(' ').filter(c => !c.startsWith('theme-')).join(' ');
     body.classList.add(`theme-${theme}`);
+    this.themeChange$.next(theme);
   }
 
   updateTheme(theme: string): Observable<any> {

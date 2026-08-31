@@ -1,6 +1,8 @@
 <div class="app-container" [class.login-layout]="!isLoggedIn()">
-  <!-- Theme Background Illustration Watermark -->
-  <div class="theme-illustration-bg"></div>
+  <!-- Global / Login Background Watermarks -->
+  <div class="dynamic-watermarks-container">
+    <div *ngFor="let item of watermarks" class="dynamic-watermark-item" [ngStyle]="item.style"></div>
+  </div>
 
   <!-- Header -->
   <header class="app-header" *ngIf="isLoggedIn()">
@@ -25,6 +27,11 @@
   <div class="main-wrapper">
     <!-- Menu Sidebar -->
     <aside class="app-sidebar" *ngIf="isLoggedIn()">
+      <!-- Sidebar / Menu Watermarks -->
+      <div class="sidebar-watermarks-container">
+        <div *ngFor="let item of sidebarWatermarks" class="sidebar-watermark-item" [ngStyle]="item.style"></div>
+      </div>
+
       <!-- Cheerful Sidebar Banner -->
       <div class="sidebar-theme-banner">
         <div class="sidebar-theme-graphic"></div>
@@ -46,14 +53,26 @@
       </nav>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Content Area (Tela Principal) -->
     <main class="app-content">
-      <router-outlet></router-outlet>
+      <!-- Main Content Watermarks -->
+      <div class="content-watermarks-container">
+        <div *ngFor="let item of contentWatermarks" class="content-watermark-item" [ngStyle]="item.style"></div>
+      </div>
+
+      <div class="content-body">
+        <router-outlet></router-outlet>
+      </div>
     </main>
   </div>
 
-  <!-- Footer -->
+  <!-- Footer (Rodapé) -->
   <footer class="app-footer" *ngIf="isLoggedIn()">
+    <!-- Footer / Rodapé Watermarks -->
+    <div class="footer-watermarks-container">
+      <div *ngFor="let item of footerWatermarks" class="footer-watermark-item" [ngStyle]="item.style"></div>
+    </div>
+
     <div class="footer-left">
       <a href="https://instagram.com/marcosaffonso" target="_blank" rel="noopener">&#64;marcosaffonso</a>
     </div>

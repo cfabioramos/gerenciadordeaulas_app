@@ -61,9 +61,9 @@
             <td>{{ matricula.valorMensalidade ? (matricula.valorMensalidade | currency:'BRL':'symbol':'1.2-2') : '-' }}
             </td>
             <td>{{ matricula.diaVencimento ? 'Dia ' + matricula.diaVencimento : '-' }}</td>
-            <td>
-              <label class="switch" (click)="$event.stopPropagation()">
-                <input type="checkbox" [(ngModel)]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)" [disabled]="!isAdmin">
+            <td (click)="$event.stopPropagation()">
+              <label class="switch">
+                <input type="checkbox" [checked]="matricula.flAtivo" (change)="toggleMatriculaAtiva(matricula, $event)" [disabled]="!isAdmin">
                 <span class="slider round"></span>
               </label>
             </td>

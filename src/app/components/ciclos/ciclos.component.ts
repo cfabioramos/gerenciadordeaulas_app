@@ -184,7 +184,7 @@ export class CiclosComponent implements OnInit {
       },
       error: (err) => {
         this.deleteLoading = false;
-        this.deleteErrorMessage = 'Erro ao excluir ciclo. Verifique se existem matrículas vinculadas.';
+        this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir o ciclo de aulas pois existem programas de aula vinculados a ele.';
         console.error(err);
       }
     });
