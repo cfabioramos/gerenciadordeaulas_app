@@ -241,14 +241,21 @@ export class MatriculasComponent implements OnInit {
   toggleMatriculaAtiva(matricula: any, event: Event) {
     event.stopPropagation();
     if (!this.isAdmin) return;
-    const originalState = matricula.flAtivo;
-    this.service.atualizarStatusMatricula(matricula.id, matricula.flAtivo).subscribe({
+    const input = event.target as HTMLInputElement;
+    const previousState = matricula.flAtivo;
+    const newState = input ? input.checked : !previousState;
+
+    matricula.flAtivo = newState;
+    this.service.atualizarStatusMatricula(matricula.id, newState).subscribe({
       next: () => {
-        // Success
+        // Status updated successfully
       },
       error: (err) => {
         console.error('Erro ao atualizar status da matrícula:', err);
-        matricula.flAtivo = originalState; // Revert status
+        matricula.flAtivo = previousState;
+        if (input) {
+          input.checked = previousState;
+        }
       }
     });
   }
