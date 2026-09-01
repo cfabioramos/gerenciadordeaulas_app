@@ -14,6 +14,7 @@ export interface Matricula {
   presente: boolean;
   programaAulaId: number;
   programaAulaNome: string;
+  flAtivo?: boolean;
 }
 
 @Component({
@@ -25,10 +26,14 @@ export interface Matricula {
 })
 export class PresencaComponent implements OnInit {
   matriculas: Matricula[] = [];
-  filteredMatriculas: Matricula[] = [];
+  filteredMatriculasAtivas: Matricula[] = [];
+  filteredMatriculasInativas: Matricula[] = [];
   searchTerm: string = '';
   sortAscending: boolean = true;
   aulaId!: number;
+  aulaData: string | null = null;
+  isAulaHoje: boolean = false;
+  errorMessage: string = '';
 
   cicloId: number | null = null;
   programaId: number | null = null;
@@ -51,6 +56,10 @@ export class PresencaComponent implements OnInit {
       this.programaNome = nav.extras.state['programaNome'] || '';
       this.aulaId = nav.extras.state['aulaId'] || null;
       this.aulaNome = nav.extras.state['aulaNome'] || '';
+      if (nav.extras.state['aulaData']) {
+        this.aulaData = nav.extras.state['aulaData'];
+        this.isAulaHoje = this.checkIsHoje(this.aulaData);
+      }
     } else if (history.state) {
       this.cicloId = history.state['cicloId'] || null;
       this.cicloNome = history.state['cicloNome'] || '';
@@ -58,6 +67,10 @@ export class PresencaComponent implements OnInit {
       this.programaNome = history.state['programaNome'] || '';
       this.aulaId = history.state['aulaId'] || null;
       this.aulaNome = history.state['aulaNome'] || '';
+      if (history.state['aulaData']) {
+        this.aulaData = history.state['aulaData'];
+        this.isAulaHoje = this.checkIsHoje(this.aulaData);
+      }
     }
   }
 
@@ -70,9 +83,40 @@ export class PresencaComponent implements OnInit {
       const id = params.get('aulaId');
       if (id) {
         this.aulaId = +id;
+        this.loadAulaDetails();
         this.loadPresencas();
       }
     });
+  }
+
+  loadAulaDetails() {
+    if (!this.aulaId) return;
+    this.service.getAulaPorId(this.aulaId).subscribe({
+      next: (aula) => {
+        if (aula) {
+          if (!this.aulaNome && aula.nome) this.aulaNome = aula.nome;
+          this.aulaData = aula.data;
+          this.isAulaHoje = this.checkIsHoje(aula.data);
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao carregar detalhes da aula:', err);
+      }
+    });
+  }
+
+  checkIsHoje(dateStr: string | null): boolean {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return false;
+    const today = new Date();
+    return d.getFullYear() === today.getFullYear() &&
+           d.getMonth() === today.getMonth() &&
+           d.getDate() === today.getDate();
+  }
+
+  canEditPresenca(matricula: Matricula): boolean {
+    return this.isAdmin && this.isAulaHoje && (matricula.flAtivo !== false);
   }
 
   loadPresencas() {
@@ -84,19 +128,24 @@ export class PresencaComponent implements OnInit {
   }
 
   applyFilter() {
-    this.filteredMatriculas = this.matriculas.filter(p =>
-      p.alunoNome?.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-    this.sortData();
+    const term = this.searchTerm.toLowerCase();
+    
+    // Separate active and inactive matriculas
+    const ativas = this.matriculas.filter(m => m.flAtivo !== false && (m.alunoNome?.toLowerCase().includes(term) ?? false));
+    const inativas = this.matriculas.filter(m => m.flAtivo === false && (m.alunoNome?.toLowerCase().includes(term) ?? false));
+
+    this.filteredMatriculasAtivas = this.sortList(ativas);
+    this.filteredMatriculasInativas = this.sortList(inativas);
   }
 
   toggleSort() {
     this.sortAscending = !this.sortAscending;
-    this.sortData();
+    this.filteredMatriculasAtivas = this.sortList(this.filteredMatriculasAtivas);
+    this.filteredMatriculasInativas = this.sortList(this.filteredMatriculasInativas);
   }
 
-  sortData() {
-    this.filteredMatriculas.sort((a, b) => {
+  private sortList(list: Matricula[]): Matricula[] {
+    return [...list].sort((a, b) => {
       const nameA = a.alunoNome?.toLowerCase() || '';
       const nameB = b.alunoNome?.toLowerCase() || '';
       if (nameA < nameB) return this.sortAscending ? -1 : 1;
@@ -106,14 +155,22 @@ export class PresencaComponent implements OnInit {
   }
 
   onTogglePresenca(matricula: Matricula, event?: Event) {
-    if (!this.isAdmin) return;
-    if (event && event.target) {
-      matricula.presente = (event.target as HTMLInputElement).checked;
+    if (!this.canEditPresenca(matricula)) {
+      if (event && event.target) {
+        (event.target as HTMLInputElement).checked = !!matricula.presente;
+      }
+      return;
     }
+
+    this.errorMessage = '';
+    const target = event?.target as HTMLInputElement;
+    const originalState = matricula.presente;
+    const newState = target ? target.checked : !originalState;
+    matricula.presente = newState;
 
     const matriculaId = matricula.id;
 
-    if (matricula.presente) {
+    if (newState) {
       // Usuário marcou como presente (true)
       this.service.registrarPresenca(this.aulaId, matriculaId).subscribe({
         next: (res) => {
@@ -125,7 +182,9 @@ export class PresencaComponent implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao registrar presença', err);
-          matricula.presente = false; // Reverte na UI
+          this.errorMessage = err.error?.message || err.error?.error || 'Erro ao registrar presença.';
+          matricula.presente = originalState; // Reverte na UI
+          if (target) target.checked = originalState;
         }
       });
     } else {
@@ -138,7 +197,9 @@ export class PresencaComponent implements OnInit {
           },
           error: (err) => {
             console.error('Erro ao remover presença', err);
-            matricula.presente = true; // Reverte na UI
+            this.errorMessage = err.error?.message || err.error?.error || 'Erro ao remover presença.';
+            matricula.presente = originalState; // Reverte na UI
+            if (target) target.checked = originalState;
           }
         });
       }
@@ -183,7 +244,8 @@ export class PresencaComponent implements OnInit {
           programaId: this.programaId,
           programaNome: this.programaNome,
           aulaId: this.aulaId,
-          aulaNome: this.aulaNome
+          aulaNome: this.aulaNome,
+          aulaData: this.aulaData
         }
       });
     } else {

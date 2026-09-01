@@ -1,137 +1,470 @@
 <div class="dashboard-container">
-  <!-- Header & Title -->
-  <div class="dashboard-header">
-    <div>
-      <h2 class="dashboard-title">📊 Dashboard de Frequência dos Alunos</h2>
-      <p class="dashboard-subtitle">Visão geral do engajamento e presença nas aulas</p>
-    </div>
-
-    <!-- View Selector Buttons -->
-    <div class="view-toggle">
-      <button 
-        [class.active]="selectedView === 'bars'" 
-        (click)="selectedView = 'bars'">
-        📊 Barras
-      </button>
-      <button 
-        [class.active]="selectedView === 'columns'" 
-        (click)="selectedView = 'columns'">
-        📈 Colunas
-      </button>
-      <button 
-        [class.active]="selectedView === 'ranking'" 
-        (click)="selectedView = 'ranking'">
-        🏆 Ranking
-      </button>
-    </div>
+  <!-- TOP TABS NAVIGATION -->
+  <div class="dashboard-nav-tabs">
+    <button 
+      class="nav-tab-btn" 
+      [class.active]="activeTab === 'frequencia'" 
+      (click)="activeTab = 'frequencia'">
+      <span class="tab-icon">🎓</span>
+      <span class="tab-text">Frequência dos Alunos</span>
+    </button>
+    <button 
+      class="nav-tab-btn" 
+      [class.active]="activeTab === 'financeiro'" 
+      (click)="activeTab = 'financeiro'">
+      <span class="tab-icon">💰</span>
+      <span class="tab-text">Detalhamento Financeiro (Receita)</span>
+    </button>
   </div>
 
-  <!-- Summary KPI Metric Cards -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon">🎓</div>
-      <div class="kpi-info">
-        <span class="kpi-label">Total de Alunos</span>
-        <span class="kpi-value">{{ totalAlunos }}</span>
+  <!-- ====================================================================== -->
+  <!-- TAB 1: DASHBOARD DE FREQUÊNCIA (ABA ESQUERDA) -->
+  <!-- ====================================================================== -->
+  <div *ngIf="activeTab === 'frequencia'" class="tab-pane-content">
+    <!-- Header & Title -->
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">📊 Dashboard de Frequência dos Alunos</h2>
+        <p class="dashboard-subtitle">Visão geral do engajamento e presença nas aulas</p>
+      </div>
+
+      <!-- View Selector Buttons -->
+      <div class="view-toggle">
+        <button 
+          [class.active]="selectedView === 'bars'" 
+          (click)="selectedView = 'bars'">
+          📊 Barras
+        </button>
+        <button 
+          [class.active]="selectedView === 'columns'" 
+          (click)="selectedView = 'columns'">
+          📈 Colunas
+        </button>
+        <button 
+          [class.active]="selectedView === 'ranking'" 
+          (click)="selectedView = 'ranking'">
+          🏆 Ranking
+        </button>
       </div>
     </div>
 
-    <div class="kpi-card">
-      <div class="kpi-icon">📈</div>
-      <div class="kpi-info">
-        <span class="kpi-label">Média de Frequência</span>
-        <span class="kpi-value">{{ mediaFrequencia }}%</span>
-      </div>
-    </div>
-
-    <div class="kpi-card">
-      <div class="kpi-icon">🥇</div>
-      <div class="kpi-info">
-        <span class="kpi-label">Maior Frequência</span>
-        <span class="kpi-value highlight-green">{{ maiorFrequencia }}%</span>
-        <small class="kpi-subtext">{{ melhorAluno }}</small>
-      </div>
-    </div>
-
-    <div class="kpi-card">
-      <div class="kpi-icon">⚠️</div>
-      <div class="kpi-info">
-        <span class="kpi-label">Menor Frequência</span>
-        <span class="kpi-value highlight-red">{{ menorFrequencia }}%</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- VIEW 1: Horizontal Bar Chart -->
-  <div *ngIf="selectedView === 'bars'" class="chart-card">
-    <h3 class="chart-title">Percentual de Presença por Aluno</h3>
-    <div class="horizontal-bars-container">
-      <div *ngFor="let item of dadosPresenca" class="bar-row">
-        <div class="bar-name">{{ item.nome }}</div>
-        <div class="bar-track">
-          <div 
-            class="bar-fill" 
-            [ngClass]="getStatusClass(item.percentual)"
-            [style.width.%]="item.percentual">
-            <span class="bar-text-inside" *ngIf="item.percentual >= 20">{{ item.percentual }}%</span>
-          </div>
-          <span class="bar-text-outside" *ngIf="item.percentual < 20">{{ item.percentual }}%</span>
+    <!-- Summary KPI Metric Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon">🎓</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total de Alunos</span>
+          <span class="kpi-value">{{ totalAlunos }}</span>
         </div>
-        <div class="bar-badge">
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Média de Frequência</span>
+          <span class="kpi-value">{{ mediaFrequencia }}%</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon">🥇</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Maior Frequência</span>
+          <span class="kpi-value highlight-green">{{ maiorFrequencia }}%</span>
+          <small class="kpi-subtext">{{ melhorAluno }}</small>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Menor Frequência</span>
+          <span class="kpi-value highlight-red">{{ menorFrequencia }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 1: Horizontal Bar Chart -->
+    <div *ngIf="selectedView === 'bars'" class="chart-card">
+      <h3 class="chart-title">Percentual de Presença por Aluno</h3>
+      <div class="horizontal-bars-container">
+        <div *ngFor="let item of dadosPresenca" class="bar-row">
+          <div class="bar-name">{{ item.nome }}</div>
+          <div class="bar-track">
+            <div 
+              class="bar-fill" 
+              [ngClass]="getStatusClass(item.percentual)"
+              [style.width.%]="item.percentual">
+              <span class="bar-text-inside" *ngIf="item.percentual >= 20">{{ item.percentual }}%</span>
+            </div>
+            <span class="bar-text-outside" *ngIf="item.percentual < 20">{{ item.percentual }}%</span>
+          </div>
+          <div class="bar-badge">
+            <span class="badge" [ngClass]="getStatusClass(item.percentual)">
+              {{ getStatusLabel(item.percentual) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: Vertical Column Chart -->
+    <div *ngIf="selectedView === 'columns'" class="chart-card">
+      <h3 class="chart-title">Comparativo em Colunas Verticais</h3>
+      <div class="column-chart-wrapper">
+        <div class="column-chart-container">
+          <div *ngFor="let item of dadosPresenca" class="column-item">
+            <div class="column-bar-wrapper">
+              <div class="column-tooltip">{{ item.percentual }}%</div>
+              <div 
+                class="column-bar" 
+                [ngClass]="getStatusClass(item.percentual)"
+                [style.height.%]="item.percentual">
+              </div>
+            </div>
+            <span class="column-label">{{ item.nome }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: Ranking Cards with Gauge Rings -->
+    <div *ngIf="selectedView === 'ranking'" class="ranking-grid">
+      <div *ngFor="let item of dadosPresenca; let i = index" class="ranking-card">
+        <div class="ranking-header">
+          <span class="rank-number">#{{ i + 1 }}</span>
           <span class="badge" [ngClass]="getStatusClass(item.percentual)">
             {{ getStatusLabel(item.percentual) }}
           </span>
         </div>
+
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" viewBox="0 0 80 80">
+            <circle class="gauge-bg" cx="40" cy="40" r="36" />
+            <circle 
+              class="gauge-progress" 
+              [ngClass]="getStatusClass(item.percentual)"
+              cx="40" 
+              cy="40" 
+              r="36"
+              [style.strokeDashoffset]="getStrokeOffset(item.percentual)"
+            />
+          </svg>
+          <span class="gauge-value">{{ item.percentual }}%</span>
+        </div>
+
+        <h4 class="ranking-name">{{ item.nome }}</h4>
       </div>
     </div>
   </div>
 
-  <!-- VIEW 2: Vertical Column Chart -->
-  <div *ngIf="selectedView === 'columns'" class="chart-card">
-    <h3 class="chart-title">Comparativo em Colunas Verticais</h3>
-    <div class="column-chart-wrapper">
-      <div class="column-chart-container">
-        <div *ngFor="let item of dadosPresenca" class="column-item">
-          <div class="column-bar-wrapper">
-            <div class="column-tooltip">{{ item.percentual }}%</div>
-            <div 
-              class="column-bar" 
-              [ngClass]="getStatusClass(item.percentual)"
-              [style.height.%]="item.percentual">
-            </div>
-          </div>
-          <span class="column-label">{{ item.nome }}</span>
+  <!-- ====================================================================== -->
+  <!-- TAB 2: DASHBOARD FINANCEIRO / RECEITA (ABA DIREITA) -->
+  <!-- ====================================================================== -->
+  <div *ngIf="activeTab === 'financeiro'" class="tab-pane-content">
+    <!-- Header & Subtitle -->
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">💰 Dashboard de Detalhamento Financeiro</h2>
+        <p class="dashboard-subtitle">Acompanhamento de receita e pagamentos recebidos no período</p>
+      </div>
+    </div>
+
+    <!-- Filtros de Período, Ciclo e Alunos -->
+    <div class="financial-filters-card">
+      <div class="filters-top-row">
+        <span class="filters-section-title">🔍 Filtros de Consulta</span>
+        
+        <!-- Preset Quick Buttons -->
+        <div class="preset-buttons">
+          <button type="button" class="btn-preset" [class.active]="selectedPreset === '30d'" (click)="setPreset('30d')">Últimos 30 dias</button>
+          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'mes'" (click)="setPreset('mes')">Este Mês</button>
+          <button type="button" class="btn-preset" [class.active]="selectedPreset === '3m'" (click)="setPreset('3m')">3 Meses</button>
+          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'ano'" (click)="setPreset('ano')">Este Ano</button>
+          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'tudo'" (click)="setPreset('tudo')">Todo Período</button>
+        </div>
+      </div>
+
+      <div class="filters-form-grid">
+        <!-- Data Início -->
+        <div class="filter-field">
+          <label for="finDataInicio">Data Inicial:</label>
+          <input 
+            id="finDataInicio" 
+            type="date" 
+            class="form-control" 
+            [(ngModel)]="dataInicio" 
+            (change)="applyFinancialFilters()" />
+        </div>
+
+        <!-- Data Fim -->
+        <div class="filter-field">
+          <label for="finDataFim">Data Final:</label>
+          <input 
+            id="finDataFim" 
+            type="date" 
+            class="form-control" 
+            [(ngModel)]="dataFim" 
+            (change)="applyFinancialFilters()" />
+        </div>
+
+        <!-- Ciclo -->
+        <div class="filter-field">
+          <label for="finCiclo">Ciclo:</label>
+          <select 
+            id="finCiclo" 
+            class="form-control" 
+            [(ngModel)]="selectedCicloId" 
+            (change)="applyFinancialFilters()">
+            <option [ngValue]="null">Todos os Ciclos</option>
+            <option *ngFor="let c of ciclos" [value]="c.id">{{ c.nome }}</option>
+          </select>
+        </div>
+
+        <!-- Aluno -->
+        <div class="filter-field">
+          <label for="finAluno">Aluno:</label>
+          <select 
+            id="finAluno" 
+            class="form-control" 
+            [(ngModel)]="selectedAlunoId" 
+            (change)="applyFinancialFilters()">
+            <option [ngValue]="null">Todos os Alunos</option>
+            <option *ngFor="let a of alunos" [value]="a.id">{{ a.nome }}</option>
+          </select>
+        </div>
+
+        <!-- Botão Limpar -->
+        <div class="filter-field-actions">
+          <button type="button" class="btn-clear-filters" (click)="limparFiltros()" title="Limpar todos os filtros">
+            Limpar Filtros
+          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- VIEW 3: Ranking Cards with Gauge Rings -->
-  <div *ngIf="selectedView === 'ranking'" class="ranking-grid">
-    <div *ngFor="let item of dadosPresenca; let i = index" class="ranking-card">
-      <div class="ranking-header">
-        <span class="rank-number">#{{ i + 1 }}</span>
-        <span class="badge" [ngClass]="getStatusClass(item.percentual)">
-          {{ getStatusLabel(item.percentual) }}
-        </span>
+    <!-- Summary KPI Financial Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card financial-card">
+        <div class="kpi-icon fin-icon-green">💵</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Receita Total no Período</span>
+          <span class="kpi-value highlight-green">{{ formatMoeda(totalReceita) }}</span>
+        </div>
       </div>
 
-      <div class="gauge-wrapper">
-        <svg class="gauge-svg" viewBox="0 0 80 80">
-          <circle class="gauge-bg" cx="40" cy="40" r="36" />
-          <circle 
-            class="gauge-progress" 
-            [ngClass]="getStatusClass(item.percentual)"
-            cx="40" 
-            cy="40" 
-            r="36"
-            [style.strokeDashoffset]="getStrokeOffset(item.percentual)"
-          />
+      <div class="kpi-card financial-card">
+        <div class="kpi-icon fin-icon-blue">🧾</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total de Pagamentos</span>
+          <span class="kpi-value">{{ totalPagamentosCount }}</span>
+          <small class="kpi-subtext">registros no período</small>
+        </div>
+      </div>
+
+      <div class="kpi-card financial-card">
+        <div class="kpi-icon fin-icon-orange">🏷️</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Ticket Médio</span>
+          <span class="kpi-value">{{ formatMoeda(ticketMedio) }}</span>
+          <small class="kpi-subtext">por pagamento</small>
+        </div>
+      </div>
+
+      <div class="kpi-card financial-card">
+        <div class="kpi-icon fin-icon-purple">💎</div>
+        <div class="kpi-info">
+          <span class="kpi-label">Maior Pagamento</span>
+          <span class="kpi-value">{{ formatMoeda(maiorPagamento) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO X x Y: Linha do Tempo (X) x Receita (Y) -->
+    <div class="chart-card financial-chart-card">
+      <div class="chart-card-header">
+        <div>
+          <h3 class="chart-title">📈 Evolução da Receita no Tempo (Gráfico X x Y)</h3>
+          <p class="chart-subtitle">Eixo X: Linha do Tempo (Datas) &nbsp;|&nbsp; Eixo Y: Receita Recebida (R$)</p>
+        </div>
+
+        <div class="chart-type-toggle">
+          <button 
+            type="button" 
+            [class.active]="chartViewType === 'area'" 
+            (click)="chartViewType = 'area'">
+            Curva / Área
+          </button>
+          <button 
+            type="button" 
+            [class.active]="chartViewType === 'bar'" 
+            (click)="chartViewType = 'bar'">
+            Colunas
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="chartPoints.length === 0" class="empty-chart-state">
+        <span class="empty-icon">📊</span>
+        <p>Nenhum pagamento registrado no período ou filtros selecionados.</p>
+      </div>
+
+      <!-- SVG XY Graphic -->
+      <div *ngIf="chartPoints.length > 0" class="svg-chart-container">
+        <!-- Hover Tooltip Box -->
+        <div *ngIf="hoveredPoint" class="chart-tooltip-box" [style.left.px]="hoveredPoint.x" [style.top.px]="hoveredPoint.y - 45">
+          <div class="tooltip-date">Data: {{ hoveredPoint.dateStr | date:'dd/MM/yyyy' }}</div>
+          <div class="tooltip-val">{{ formatMoeda(hoveredPoint.valor) }}</div>
+          <div class="tooltip-count">{{ hoveredPoint.count }} pagamento(s)</div>
+        </div>
+
+        <svg class="xy-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="financialGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          <!-- Grid Lines (Eixo Y) -->
+          <g class="grid-lines">
+            <line *ngFor="let m of yAxisMarkers" x1="70" [attr.y1]="m.y" x2="760" [attr.y2]="m.y" class="grid-line" />
+          </g>
+
+          <!-- Marcadores de Texto do Eixo Y -->
+          <g class="y-axis-labels">
+            <text *ngFor="let m of yAxisMarkers" x="62" [attr.y]="m.y + 4" text-anchor="end" class="axis-label-text">
+              {{ m.label }}
+            </text>
+          </g>
+
+          <!-- VIEW: Área / Linha Contínua -->
+          <g *ngIf="chartViewType === 'area'">
+            <path [attr.d]="svgPathArea" fill="url(#financialGradient)" />
+            <path [attr.d]="svgPathLine" fill="none" stroke="var(--primary)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+          </g>
+
+          <!-- VIEW: Colunas / Barras -->
+          <g *ngIf="chartViewType === 'bar'">
+            <rect 
+              *ngFor="let pt of chartPoints"
+              [attr.x]="pt.x - 14"
+              [attr.y]="pt.y"
+              width="28"
+              [attr.height]="245 - pt.y"
+              rx="4"
+              class="chart-svg-bar"
+              (mouseenter)="hoveredPoint = pt"
+              (mouseleave)="hoveredPoint = null"
+            />
+          </g>
+
+          <!-- Pontos Interativos (Circles) -->
+          <g class="chart-points">
+            <circle 
+              *ngFor="let pt of chartPoints"
+              [attr.cx]="pt.x"
+              [attr.cy]="pt.y"
+              r="6"
+              class="chart-point-circle"
+              (mouseenter)="hoveredPoint = pt"
+              (mouseleave)="hoveredPoint = null"
+            />
+          </g>
+
+          <!-- Rótulos do Eixo X (Datas) -->
+          <g class="x-axis-labels">
+            <text 
+              *ngFor="let pt of chartPoints; let i = index"
+              [attr.x]="pt.x"
+              y="268"
+              text-anchor="middle"
+              class="axis-label-text x-text">
+              {{ pt.formattedDate }}
+            </text>
+          </g>
         </svg>
-        <span class="gauge-value">{{ item.percentual }}%</span>
+      </div>
+    </div>
+
+    <!-- TABELA DE DETALHAMENTO DOS DADOS DO GRÁFICO -->
+    <div class="financial-table-card">
+      <div class="table-card-header">
+        <div>
+          <h3 class="table-card-title">📋 Detalhamento dos Pagamentos Recebidos</h3>
+          <p class="table-card-subtitle">Registros detalhados correspondentes ao período e filtros do gráfico</p>
+        </div>
+
+        <div class="table-filter-input">
+          <input 
+            type="text" 
+            placeholder="Buscar por aluno, ciclo ou valor..." 
+            [(ngModel)]="tableSearch" 
+            class="form-control table-search-box" />
+        </div>
       </div>
 
-      <h4 class="ranking-name">{{ item.nome }}</h4>
+      <div class="table-responsive">
+        <table class="list-table">
+          <thead>
+            <tr>
+              <th (click)="sortBy('id')" style="cursor: pointer;">
+                ID {{ sortColumn === 'id' ? (sortAscending ? '▲' : '▼') : '' }}
+              </th>
+              <th (click)="sortBy('data')" style="cursor: pointer;">
+                Data do Pagamento {{ sortColumn === 'data' ? (sortAscending ? '▲' : '▼') : '' }}
+              </th>
+              <th (click)="sortBy('alunoNome')" style="cursor: pointer;">
+                Aluno {{ sortColumn === 'alunoNome' ? (sortAscending ? '▲' : '▼') : '' }}
+              </th>
+              <th>Ciclo / Programa</th>
+              <th>Composição (Matrículas)</th>
+              <th (click)="sortBy('valor')" style="cursor: pointer; text-align: right;">
+                Valor Recebido {{ sortColumn === 'valor' ? (sortAscending ? '▲' : '▼') : '' }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pag of displayedTableList">
+              <td><strong>#{{ pag.id }}</strong></td>
+              <td>{{ pag.data | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="table-student-name">{{ pag.alunoNome || '-' }}</span>
+              </td>
+              <td>
+                <span class="badge-cycle" *ngIf="pag.cicloNome">{{ pag.cicloNome }}</span>
+                <span *ngIf="!pag.cicloNome">-</span>
+              </td>
+              <td>
+                <div *ngIf="pag.itens && pag.itens.length > 0" class="payment-items-summary">
+                  <span *ngFor="let item of pag.itens" class="payment-item-pill">
+                    {{ item.programaAulaNome || 'Matrícula #' + item.matriculaId }}
+                  </span>
+                </div>
+                <span *ngIf="!pag.itens || pag.itens.length === 0">-</span>
+              </td>
+              <td style="text-align: right; font-weight: 600; color: #16a34a;">
+                {{ formatMoeda(pag.valor) }}
+              </td>
+            </tr>
+            <tr *ngIf="displayedTableList.length === 0">
+              <td colspan="6" style="text-align: center; padding: 30px 15px; color: #64748b;">
+                Nenhum registro de pagamento encontrado para os filtros selecionados.
+              </td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="displayedTableList.length > 0">
+            <tr class="table-total-row">
+              <td colspan="5" style="text-align: right; font-weight: 700;">
+                Total Filtrado ({{ displayedTableList.length }} pagamentos):
+              </td>
+              <td style="text-align: right; font-weight: 700; font-size: 1.05rem; color: #16a34a;">
+                {{ formatMoeda(totalReceita) }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 </div>

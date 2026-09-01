@@ -26,6 +26,20 @@
     </div>
   </div>
 
+  <!-- Alert Messages -->
+  <div *ngIf="errorMessage" class="alert alert-danger" style="margin: 0 0 15px 0;">
+    {{ errorMessage }}
+  </div>
+
+  <!-- History/Read-Only Notice for Past or Future Classes -->
+  <div *ngIf="aulaData && !isAulaHoje" class="history-banner">
+    <span class="history-icon">ℹ️</span>
+    <span class="history-text">
+      <strong>Modo de Consulta (Histórico):</strong> Aula do dia {{ aulaData | date:'dd/MM/yyyy' }}. A alteração de presenças só é permitida em aulas do dia atual.
+    </span>
+  </div>
+
+  <!-- Tabela de Alunos Ativos -->
   <div class="table-responsive">
     <table class="list-table">
       <thead>
@@ -35,24 +49,60 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let matricula of filteredMatriculas">
-          <td>{{ matricula.alunoNome }}</td>
+        <tr *ngFor="let matricula of filteredMatriculasAtivas">
           <td>
-            <label class="switch">
-              <input 
-                type="checkbox" 
-                [checked]="matricula.presente" 
-                [(ngModel)]="matricula.presente" 
+            <span class="student-name">{{ matricula.alunoNome }}</span>
+          </td>
+          <td>
+            <label class="switch" [class.disabled]="!canEditPresenca(matricula)" [title]="!isAulaHoje ? 'Presenças só podem ser alteradas no dia da aula' : (!isAdmin ? 'Apenas administradores podem alterar presenças' : '')">
+              <input
+                type="checkbox"
+                [checked]="matricula.presente"
                 (change)="onTogglePresenca(matricula, $event)"
-                [disabled]="!isAdmin">
+                [disabled]="!canEditPresenca(matricula)">
               <span class="slider round"></span>
             </label>
           </td>
         </tr>
-        <tr *ngIf="filteredMatriculas.length === 0">
-          <td colspan="2" style="text-align: center;">Nenhuma presença encontrada para esta aula.</td>
+        <tr *ngIf="filteredMatriculasAtivas.length === 0">
+          <td colspan="2" style="text-align: center;">Nenhum aluno ativo encontrado para esta aula.</td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Seção de Alunos Inativos (Lixeira / Arquivados) -->
+  <div class="inativos-container" *ngIf="filteredMatriculasInativas.length > 0 || searchTerm">
+    <div class="inativos-header">
+      <div class="inativos-title-group">
+        <span class="inativos-icon">🗑️</span>
+        <h3 class="inativos-title">Alunos Inativos</h3>
+        <span class="inativos-badge">{{ filteredMatriculasInativas.length }}</span>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="list-table inativos-table">
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let matricula of filteredMatriculasInativas" class="inactive-row">
+            <td>
+              <span class="student-name">{{ matricula.alunoNome }}</span>
+            </td>
+            <td>
+              <span class="badge-inactive">Inativo</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredMatriculasInativas.length === 0">
+            <td colspan="3" style="text-align: center;">Nenhum aluno inativo correspondente ao filtro.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
