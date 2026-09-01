@@ -85,6 +85,19 @@ export class GerenciadorAulasService {
     return this.http.get<any[]>(`${API_URL}/pagamentos/aluno/${alunoId}`);
   }
 
+  getTodosPagamentos(params?: { inicio?: string, fim?: string, alunoId?: number, cicloId?: number }): Observable<any[]> {
+    let query = '';
+    if (params) {
+      const q: string[] = [];
+      if (params.inicio) q.push(`inicio=${encodeURIComponent(params.inicio)}`);
+      if (params.fim) q.push(`fim=${encodeURIComponent(params.fim)}`);
+      if (params.alunoId) q.push(`alunoId=${params.alunoId}`);
+      if (params.cicloId) q.push(`cicloId=${params.cicloId}`);
+      if (q.length > 0) query = '?' + q.join('&');
+    }
+    return this.http.get<any[]>(`${API_URL}/pagamentos${query}`);
+  }
+
   criarPagamento(pagamento: any): Observable<any> {
     return this.http.post<any>(`${API_URL}/pagamentos`, pagamento);
   }
@@ -138,5 +151,9 @@ export class GerenciadorAulasService {
 
   deletarAula(id: number): Observable<any> {
     return this.http.delete<any>(`${API_URL}/aulas/${id}`);
+  }
+
+  getAulaPorId(id: number): Observable<any> {
+    return this.http.get<any>(`${API_URL}/aulas/${id}`);
   }
 }

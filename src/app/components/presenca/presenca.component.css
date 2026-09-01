@@ -53,3 +53,150 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.switch.disabled,
+.switch input:disabled + .slider {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* History / Read-only Banner */
+.history-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #e0f2fe;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.history-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.history-text {
+  line-height: 1.4;
+}
+
+/* Inactive / Trash Section */
+.inativos-container {
+  margin-top: 35px;
+  padding: 20px;
+  background: rgba(248, 250, 252, 0.85);
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+body.theme-dancacircular .inativos-container {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.inativos-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 15px;
+}
+
+.inativos-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inativos-icon {
+  font-size: 1.2rem;
+}
+
+.inativos-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0;
+}
+
+body.theme-dancacircular .inativos-title {
+  color: #cbd5e1;
+}
+
+.inativos-badge {
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+body.theme-dancacircular .inativos-badge {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.inativos-subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+body.theme-dancacircular .inativos-subtitle {
+  color: #94a3b8;
+}
+
+.inativos-table {
+  background-color: transparent;
+}
+
+.inactive-row td {
+  color: #64748b;
+}
+
+body.theme-dancacircular .inactive-row td {
+  color: #94a3b8;
+}
+
+.badge-inactive {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+body.theme-dancacircular .badge-inactive {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.presenca-status-label {
+  margin-left: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+  vertical-align: middle;
+}
+
+.presenca-status-label.presente {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* Error Alert */
+.alert-danger {
+  padding: 10px 16px;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
