@@ -170,45 +170,54 @@
       </div>
     </div>
 
-    <!-- Filtros de Período, Ciclo e Alunos -->
+    <!-- Form de Filtros Organizado -->
     <div class="financial-filters-card">
       <div class="filters-top-row">
-        <span class="filters-section-title">🔍 Filtros de Consulta</span>
-        
-        <!-- Preset Quick Buttons -->
-        <div class="preset-buttons">
-          <button type="button" class="btn-preset" [class.active]="selectedPreset === '30d'" (click)="setPreset('30d')">Últimos 30 dias</button>
-          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'mes'" (click)="setPreset('mes')">Este Mês</button>
-          <button type="button" class="btn-preset" [class.active]="selectedPreset === '3m'" (click)="setPreset('3m')">3 Meses</button>
-          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'ano'" (click)="setPreset('ano')">Este Ano</button>
-          <button type="button" class="btn-preset" [class.active]="selectedPreset === 'tudo'" (click)="setPreset('tudo')">Todo Período</button>
+        <div class="filters-title-group">
+          <span class="filters-section-title">🔍 Filtros de Consulta</span>
+          <span class="filters-section-hint">Período, Ciclo e Seleção de Alunos</span>
+        </div>
+
+        <!-- Presets e Limpar Filtros -->
+        <div class="top-actions-group">
+          <div class="preset-buttons">
+            <button type="button" class="btn-preset" [class.active]="selectedPreset === '30d'" (click)="setPreset('30d')">30 dias</button>
+            <button type="button" class="btn-preset" [class.active]="selectedPreset === 'mes'" (click)="setPreset('mes')">Este Mês</button>
+            <button type="button" class="btn-preset" [class.active]="selectedPreset === '3m'" (click)="setPreset('3m')">3 Meses</button>
+            <button type="button" class="btn-preset" [class.active]="selectedPreset === 'ano'" (click)="setPreset('ano')">Este Ano</button>
+            <button type="button" class="btn-preset" [class.active]="selectedPreset === 'tudo'" (click)="setPreset('tudo')">Tudo</button>
+          </div>
+          <button type="button" class="btn-clear-filters" (click)="limparFiltros()" title="Limpar todos os filtros">
+            ✕ Limpar
+          </button>
         </div>
       </div>
 
       <div class="filters-form-grid">
-        <!-- Data Início -->
-        <div class="filter-field">
-          <label for="finDataInicio">Data Inicial:</label>
-          <input 
-            id="finDataInicio" 
-            type="date" 
-            class="form-control" 
-            [(ngModel)]="dataInicio" 
-            (change)="applyFinancialFilters()" />
+        <!-- Grupo de Datas Alinhadas Horizontalmente (com adaptação vertical no mobile) -->
+        <div class="date-range-group">
+          <div class="filter-field date-field">
+            <label for="finDataInicio">Data Inicial:</label>
+            <input 
+              id="finDataInicio" 
+              type="date" 
+              class="form-control" 
+              [(ngModel)]="dataInicio" 
+              (change)="applyFinancialFilters()" />
+          </div>
+          <span class="date-sep">até</span>
+          <div class="filter-field date-field">
+            <label for="finDataFim">Data Final:</label>
+            <input 
+              id="finDataFim" 
+              type="date" 
+              class="form-control" 
+              [(ngModel)]="dataFim" 
+              (change)="applyFinancialFilters()" />
+          </div>
         </div>
 
-        <!-- Data Fim -->
-        <div class="filter-field">
-          <label for="finDataFim">Data Final:</label>
-          <input 
-            id="finDataFim" 
-            type="date" 
-            class="form-control" 
-            [(ngModel)]="dataFim" 
-            (change)="applyFinancialFilters()" />
-        </div>
-
-        <!-- Ciclo -->
+        <!-- Filtro de Ciclo -->
         <div class="filter-field">
           <label for="finCiclo">Ciclo:</label>
           <select 
@@ -221,24 +230,49 @@
           </select>
         </div>
 
-        <!-- Aluno -->
-        <div class="filter-field">
-          <label for="finAluno">Aluno:</label>
-          <select 
-            id="finAluno" 
-            class="form-control" 
-            [(ngModel)]="selectedAlunoId" 
-            (change)="applyFinancialFilters()">
-            <option [ngValue]="null">Todos os Alunos</option>
-            <option *ngFor="let a of alunos" [value]="a.id">{{ a.nome }}</option>
-          </select>
-        </div>
+        <!-- Filtro Multi-Select de Alunos (1 ou vários alunos) -->
+        <div class="filter-field aluno-multi-filter">
+          <label>Alunos:</label>
+          <div class="multi-select-wrapper">
+            <button 
+              type="button" 
+              class="form-control multi-select-trigger" 
+              (click)="toggleAlunoDropdown()">
+              <span class="multi-select-label">{{ getSelectedAlunosLabel() }}</span>
+              <span class="multi-select-arrow">{{ alunoDropdownOpen ? '▲' : '▼' }}</span>
+            </button>
 
-        <!-- Botão Limpar -->
-        <div class="filter-field-actions">
-          <button type="button" class="btn-clear-filters" (click)="limparFiltros()" title="Limpar todos os filtros">
-            Limpar Filtros
-          </button>
+            <!-- Dropdown Menu Flutuante -->
+            <div *ngIf="alunoDropdownOpen" class="multi-select-dropdown" (click)="$event.stopPropagation()">
+              <div class="dropdown-search-box">
+                <input 
+                  type="text" 
+                  placeholder="Buscar aluno..." 
+                  [(ngModel)]="alunoSearchTerm" 
+                  class="form-control search-input-sm" />
+              </div>
+
+              <div class="dropdown-actions-row">
+                <button type="button" class="btn-link-sm" (click)="selectAllAlunos()">Selecionar Todos</button>
+                <button type="button" class="btn-link-sm" (click)="clearAlunoSelection()">Limpar</button>
+              </div>
+
+              <div class="dropdown-items-list">
+                <label 
+                  *ngFor="let a of dropdownAlunosList" 
+                  class="dropdown-checkbox-item">
+                  <input 
+                    type="checkbox" 
+                    [checked]="isAlunoSelected(a.id)" 
+                    (change)="toggleAlunoSelection(a.id)" />
+                  <span class="checkbox-label-text">{{ a.nome }}</span>
+                </label>
+                <div *ngIf="dropdownAlunosList.length === 0" class="dropdown-empty-text">
+                  Nenhum aluno encontrado
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -313,7 +347,7 @@
       <div *ngIf="chartPoints.length > 0" class="svg-chart-container">
         <!-- Hover Tooltip Box -->
         <div *ngIf="hoveredPoint" class="chart-tooltip-box" [style.left.px]="hoveredPoint.x" [style.top.px]="hoveredPoint.y - 45">
-          <div class="tooltip-date">Data: {{ hoveredPoint.dateStr | date:'dd/MM/yyyy' }}</div>
+          <div class="tooltip-date">Data: {{ formatDisplayDate(hoveredPoint.dateStr) }}</div>
           <div class="tooltip-val">{{ formatMoeda(hoveredPoint.valor) }}</div>
           <div class="tooltip-count">{{ hoveredPoint.count }} pagamento(s)</div>
         </div>
@@ -375,7 +409,7 @@
           <!-- Rótulos do Eixo X (Datas) -->
           <g class="x-axis-labels">
             <text 
-              *ngFor="let pt of chartPoints; let i = index"
+              *ngFor="let pt of chartPoints"
               [attr.x]="pt.x"
               y="268"
               text-anchor="middle"
@@ -392,13 +426,13 @@
       <div class="table-card-header">
         <div>
           <h3 class="table-card-title">📋 Detalhamento dos Pagamentos Recebidos</h3>
-          <p class="table-card-subtitle">Registros detalhados correspondentes ao período e filtros do gráfico</p>
+          <p class="table-card-subtitle">Registros correspondentes ao período e filtros selecionados</p>
         </div>
 
         <div class="table-filter-input">
           <input 
             type="text" 
-            placeholder="Buscar por aluno, ciclo ou valor..." 
+            placeholder="Buscar por aluno, ciclo, data ou valor..." 
             [(ngModel)]="tableSearch" 
             class="form-control table-search-box" />
         </div>
@@ -427,7 +461,7 @@
           <tbody>
             <tr *ngFor="let pag of displayedTableList">
               <td><strong>#{{ pag.id }}</strong></td>
-              <td>{{ pag.data | date:'dd/MM/yyyy' }}</td>
+              <td>{{ formatDisplayDate(pag.data) }}</td>
               <td>
                 <span class="table-student-name">{{ pag.alunoNome || '-' }}</span>
               </td>

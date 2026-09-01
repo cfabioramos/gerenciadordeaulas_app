@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
@@ -53,8 +53,12 @@ export class DashboardsComponent implements OnInit {
   dataInicio: string = '';
   dataFim: string = '';
   selectedCicloId: number | null = null;
-  selectedAlunoId: number | null = null;
+  selectedAlunoIds: number[] = [];
   selectedPreset: string = '30d';
+
+  // Multi-select Alunos
+  alunoDropdownOpen: boolean = false;
+  alunoSearchTerm: string = '';
 
   ciclos: any[] = [];
   alunos: any[] = [];
@@ -82,7 +86,17 @@ export class DashboardsComponent implements OnInit {
   sortColumn: string = 'data';
   sortAscending: boolean = false;
 
-  constructor(private service: GerenciadorAulasService) {}
+  constructor(
+    private service: GerenciadorAulasService,
+    private elementRef: ElementRef
+  ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.alunoDropdownOpen && !this.elementRef.nativeElement.querySelector('.aluno-multi-filter')?.contains(event.target)) {
+      this.alunoDropdownOpen = false;
+    }
+  }
 
   ngOnInit(): void {
     this.calcularMetricasFrequencia();
@@ -136,11 +150,51 @@ export class DashboardsComponent implements OnInit {
     this.dataInicio = this.formatDateISO(oneMonthAgo);
   }
 
-  private formatDateISO(date: Date): string {
+  formatDateISO(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  parseDate(d: any): Date {
+    if (!d) return new Date(0);
+    if (d instanceof Date) return d;
+    if (typeof d === 'string') {
+      const trimmed = d.trim();
+      if (trimmed.includes('/')) {
+        const [day, month, year] = trimmed.split('/').map(Number);
+        return new Date(year, month - 1, day);
+      }
+      if (trimmed.includes('-')) {
+        const parts = trimmed.split('T')[0].split('-').map(Number);
+        if (parts.length === 3) {
+          return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+      }
+      return new Date(trimmed);
+    }
+    return new Date(d);
+  }
+
+  formatDisplayDate(d: any): string {
+    if (!d) return '-';
+    if (typeof d === 'string') {
+      const trimmed = d.trim();
+      if (trimmed.includes('/')) return trimmed;
+      if (trimmed.includes('-')) {
+        const parts = trimmed.split('T')[0].split('-');
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+      }
+    }
+    const dateObj = this.parseDate(d);
+    if (isNaN(dateObj.getTime()) || dateObj.getTime() === 0) return '-';
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const year = dateObj.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   loadFilterOptions(): void {
@@ -159,7 +213,7 @@ export class DashboardsComponent implements OnInit {
     this.loadingFinanceiro = true;
     this.service.getTodosPagamentos().subscribe({
       next: (data) => {
-        this.pagamentos = data || [];
+        this.pagamentos = (data || []).filter(p => p && p.id != null);
         this.loadingFinanceiro = false;
         this.applyFinancialFilters();
       },
@@ -171,11 +225,12 @@ export class DashboardsComponent implements OnInit {
   }
 
   applyFinancialFilters(): void {
-    let result = [...this.pagamentos];
+    let result = this.pagamentos.filter(p => p && p.id != null);
 
     // Filtro de Data Início
     if (this.dataInicio) {
-      const inicio = new Date(this.dataInicio + 'T00:00:00');
+      const inicio = this.parseDate(this.dataInicio);
+      inicio.setHours(0, 0, 0, 0);
       result = result.filter(p => {
         const d = this.parseDate(p.data);
         return d >= inicio;
@@ -184,7 +239,8 @@ export class DashboardsComponent implements OnInit {
 
     // Filtro de Data Fim
     if (this.dataFim) {
-      const fim = new Date(this.dataFim + 'T23:59:59');
+      const fim = this.parseDate(this.dataFim);
+      fim.setHours(23, 59, 59, 999);
       result = result.filter(p => {
         const d = this.parseDate(p.data);
         return d <= fim;
@@ -197,16 +253,63 @@ export class DashboardsComponent implements OnInit {
       result = result.filter(p => p.cicloId === cId || (p.itens && p.itens.some((i: any) => i.cicloId === cId)));
     }
 
-    // Filtro de Aluno
-    if (this.selectedAlunoId) {
-      const aId = +this.selectedAlunoId;
-      result = result.filter(p => p.alunoId === aId);
+    // Filtro Multi-Select de Alunos
+    if (this.selectedAlunoIds && this.selectedAlunoIds.length > 0) {
+      result = result.filter(p => p.alunoId != null && this.selectedAlunoIds.includes(p.alunoId));
     }
 
     this.filteredPagamentos = result;
     this.calcularMetricasFinanceiras();
     this.gerarGraficoXY();
     this.sortFinancialTable();
+  }
+
+  // ------------------------------------------
+  // MÉTODOS DO MULTI-SELECT DE ALUNOS
+  // ------------------------------------------
+  toggleAlunoDropdown(): void {
+    this.alunoDropdownOpen = !this.alunoDropdownOpen;
+  }
+
+  isAlunoSelected(id: number): boolean {
+    return this.selectedAlunoIds.includes(id);
+  }
+
+  toggleAlunoSelection(id: number): void {
+    const idx = this.selectedAlunoIds.indexOf(id);
+    if (idx > -1) {
+      this.selectedAlunoIds.splice(idx, 1);
+    } else {
+      this.selectedAlunoIds.push(id);
+    }
+    this.applyFinancialFilters();
+  }
+
+  selectAllAlunos(): void {
+    this.selectedAlunoIds = this.dropdownAlunosList.map(a => a.id);
+    this.applyFinancialFilters();
+  }
+
+  clearAlunoSelection(): void {
+    this.selectedAlunoIds = [];
+    this.applyFinancialFilters();
+  }
+
+  getSelectedAlunosLabel(): string {
+    if (this.selectedAlunoIds.length === 0) {
+      return 'Todos os Alunos';
+    }
+    if (this.selectedAlunoIds.length === 1) {
+      const aluno = this.alunos.find(a => a.id === this.selectedAlunoIds[0]);
+      return aluno ? aluno.nome : '1 aluno selecionado';
+    }
+    return `${this.selectedAlunoIds.length} alunos selecionados`;
+  }
+
+  get dropdownAlunosList(): any[] {
+    if (!this.alunoSearchTerm.trim()) return this.alunos;
+    const term = this.alunoSearchTerm.toLowerCase();
+    return this.alunos.filter(a => a.nome && a.nome.toLowerCase().includes(term));
   }
 
   setPreset(preset: string): void {
@@ -242,21 +345,10 @@ export class DashboardsComponent implements OnInit {
 
   limparFiltros(): void {
     this.selectedCicloId = null;
-    this.selectedAlunoId = null;
+    this.selectedAlunoIds = [];
+    this.alunoSearchTerm = '';
     this.tableSearch = '';
     this.setPreset('30d');
-  }
-
-  private parseDate(d: any): Date {
-    if (!d) return new Date(0);
-    if (typeof d === 'string') {
-      if (d.includes('/')) {
-        const [day, month, year] = d.split('/').map(Number);
-        return new Date(year, month - 1, day);
-      }
-      return new Date(d);
-    }
-    return new Date(d);
   }
 
   calcularMetricasFinanceiras(): void {
@@ -309,7 +401,6 @@ export class DashboardsComponent implements OnInit {
     }
 
     if (maxVal <= 0) maxVal = 100;
-    // Arredondar para um valor agradável no topo da escala Y
     const magnitude = Math.pow(10, Math.floor(Math.log10(maxVal)));
     this.maxYValue = Math.ceil(maxVal / magnitude) * magnitude;
     if (this.maxYValue === maxVal) this.maxYValue += magnitude;
@@ -374,7 +465,6 @@ export class DashboardsComponent implements OnInit {
       for (let i = 1; i < points.length; i++) {
         const prev = points[i - 1];
         const curr = points[i];
-        // Interpolação suave de Bézier
         const cpX1 = prev.x + (curr.x - prev.x) / 2;
         const cpY1 = prev.y;
         const cpX2 = prev.x + (curr.x - prev.x) / 2;
@@ -426,15 +516,17 @@ export class DashboardsComponent implements OnInit {
   }
 
   get displayedTableList(): any[] {
+    const list = this.filteredPagamentos.filter(p => p && p.id != null);
     if (!this.tableSearch || !this.tableSearch.trim()) {
-      return this.filteredPagamentos;
+      return list;
     }
     const term = this.tableSearch.toLowerCase().trim();
-    return this.filteredPagamentos.filter(p => {
+    return list.filter(p => {
       const alunoMatch = (p.alunoNome || '').toLowerCase().includes(term);
       const cicloMatch = (p.cicloNome || '').toLowerCase().includes(term);
       const valorMatch = (p.valor || '').toString().includes(term);
-      return alunoMatch || cicloMatch || valorMatch;
+      const dateMatch = this.formatDisplayDate(p.data).includes(term);
+      return alunoMatch || cicloMatch || valorMatch || dateMatch;
     });
   }
 
