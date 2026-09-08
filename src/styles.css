@@ -577,22 +577,30 @@ body.theme-frevo .sidebar-theme-graphic {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 99999;
   backdrop-filter: blur(4px);
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .modal-content {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  width: 90%;
-  max-width: 460px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   animation: modalFadeIn 0.25s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes modalFadeIn {
@@ -602,7 +610,15 @@ body.theme-frevo .sidebar-theme-graphic {
   }
   to {
     transform: translateY(0);
-    opacity: 1;
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 
@@ -613,6 +629,7 @@ body.theme-frevo .sidebar-theme-graphic {
   padding: 18px 24px;
   border-bottom: 1px solid #eeeeee;
   background-color: #fcfcfc;
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -637,8 +654,20 @@ body.theme-frevo .sidebar-theme-graphic {
   color: #333333;
 }
 
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow: hidden;
+  min-height: 0;
+}
+
 .modal-body {
-  padding: 24px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .modal-footer {
@@ -648,6 +677,40 @@ body.theme-frevo .sidebar-theme-graphic {
   padding: 16px 24px;
   border-top: 1px solid #eeeeee;
   background-color: #fcfcfc;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 88dvh;
+    border-radius: 16px 16px 0 0;
+    animation: modalSlideUp 0.25s ease-out;
+  }
+
+  .modal-header {
+    padding: 14px 18px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+  }
+
+  .modal-footer {
+    padding: 12px 18px;
+    gap: 10px;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+    padding: 10px 12px;
+  }
 }
 
 .form-group {
