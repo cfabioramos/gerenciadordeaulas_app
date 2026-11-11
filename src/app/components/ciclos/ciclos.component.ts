@@ -16,7 +16,8 @@ export class CiclosComponent implements OnInit {
   ciclos: any[] = [];
   filteredCiclos: any[] = [];
   searchTerm: string = '';
-  sortAscending: boolean = true;
+  sortColumn: 'nome' | 'dataInicio' = 'dataInicio';
+  sortAscending: boolean = false;
 
   // Modals state
   showModal: boolean = false;
@@ -68,13 +69,24 @@ export class CiclosComponent implements OnInit {
     this.sortData();
   }
 
-  toggleSort() {
-    this.sortAscending = !this.sortAscending;
+  sortBy(column: 'nome' | 'dataInicio') {
+    if (this.sortColumn === column) {
+      this.sortAscending = !this.sortAscending;
+    } else {
+      this.sortColumn = column;
+      this.sortAscending = true;
+    }
     this.sortData();
   }
 
   sortData() {
     this.filteredCiclos.sort((a, b) => {
+      if (this.sortColumn === 'dataInicio') {
+        const dateA = a.dataInicio ? new Date(a.dataInicio).getTime() : 0;
+        const dateB = b.dataInicio ? new Date(b.dataInicio).getTime() : 0;
+        return this.sortAscending ? dateA - dateB : dateB - dateA;
+      }
+
       const nameA = a.nome?.toLowerCase() || '';
       const nameB = b.nome?.toLowerCase() || '';
       if (nameA < nameB) return this.sortAscending ? -1 : 1;
