@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../../services/gerenciador-aulas.service';
@@ -51,5 +51,10 @@ export class NovoAlunoComponent {
     this.nome = '';
     this.errorMessage = '';
     this.cancelado.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.fechar();
   }
 }

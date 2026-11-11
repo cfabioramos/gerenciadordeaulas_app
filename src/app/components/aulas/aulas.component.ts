@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -143,7 +143,10 @@ export class AulasComponent implements OnInit {
 
     if (isNaN(d.getTime())) return '';
 
-    const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    const diasSemana = [
+      'Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
+      'Quinta-feira', 'Sexta-feira', 'Sábado'
+    ];
     const meses = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -152,12 +155,13 @@ export class AulasComponent implements OnInit {
     const diaSemana = diasSemana[d.getDay()];
     const diaNumero = d.getDate();
     const mesExtenso = meses[d.getMonth()];
+    const ano = d.getFullYear();
 
     // Format hour and minute
     const hours = d.getHours().toString().padStart(2, '0');
     const minutes = d.getMinutes().toString().padStart(2, '0');
 
-    return `${diaSemana}, dia ${diaNumero} de ${mesExtenso} às ${hours}:${minutes}`;
+    return `${hours}:${minutes} de ${diaSemana}, ${diaNumero} de ${mesExtenso} de ${ano}`;
   }
 
   selectAula(aula: any) {
@@ -278,6 +282,17 @@ export class AulasComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showDeleteConfirmModal) {
+      this.showDeleteConfirmModal = false;
+      return;
+    }
+    if (this.showModal) {
+      this.showModal = false;
+    }
   }
 
   goToCiclos() {

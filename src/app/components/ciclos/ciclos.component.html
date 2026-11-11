@@ -3,7 +3,7 @@
     <h2 class="list-title">Ciclos de Aulas</h2>
     <div class="filters">
       <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
-      <button class="btn-primary" (click)="openNovoCicloModal()" *ngIf="isAdmin" style="margin-left: 5px;">
+      <button class="btn-create" (click)="openNovoCicloModal()" *ngIf="isAdmin">
         + Novo Ciclo
       </button>
     </div>
@@ -25,12 +25,10 @@
           <td>{{ ciclo.dataInicio | date:'dd/MM/yyyy' }}</td>
           <td>{{ ciclo.dataFim | date:'dd/MM/yyyy' }}</td>
           <td *ngIf="isAdmin" (click)="$event.stopPropagation()">
-            <button class="btn-edit" (click)="openEditarCicloModal(ciclo, $event)" title="Editar Ciclo"
-              style="margin-right: 6px; padding: 5px 10px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button class="btn-edit" (click)="openEditarCicloModal(ciclo, $event)" title="Editar Ciclo">
               Editar
             </button>
-            <button class="btn-delete" (click)="openDeletarCicloModal(ciclo.id, $event)" title="Excluir Ciclo"
-              style="padding: 5px 10px; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button class="btn-delete" (click)="openDeletarCicloModal(ciclo.id, $event)" title="Excluir Ciclo">
               Excluir
             </button>
           </td>

@@ -18,10 +18,7 @@
     </div>
     <div class="filters">
       <input type="text" placeholder="Filtrar por data/nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
-      <button (click)="toggleSort()">
-        Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
-      </button>
-      <button class="btn-primary" (click)="openNovaAulaModal()" *ngIf="isAdmin" style="margin-left: 5px;">
+      <button class="btn-create" (click)="openNovaAulaModal()" *ngIf="isAdmin">
         + Nova Aula
       </button>
     </div>
@@ -41,12 +38,10 @@
           <td>{{ aula.nome }}</td>
           <td>{{ formatData(aula.data) }}</td>
           <td *ngIf="isAdmin" (click)="$event.stopPropagation()">
-            <button class="btn-edit" (click)="openEditarAulaModal(aula, $event)" title="Editar Aula"
-              style="margin-right: 6px; padding: 5px 10px; background-color: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button class="btn-edit" (click)="openEditarAulaModal(aula, $event)" title="Editar Aula">
               Editar
             </button>
-            <button class="btn-delete" (click)="openDeletarAulaModal(aula.id, $event)" title="Excluir Aula"
-              style="padding: 5px 10px; background-color: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button class="btn-delete" (click)="openDeletarAulaModal(aula.id, $event)" title="Excluir Aula">
               Excluir
             </button>
           </td>
@@ -61,26 +56,26 @@
 
 <!-- Modal Novo/Editar Aula -->
 <div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content aula-modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h3 class="modal-title">{{ isEditing ? 'Editar Aula' : 'Cadastrar Aula' }}</h3>
       <button type="button" class="btn-close" (click)="showModal = false" [disabled]="modalLoading" title="Fechar">&times;</button>
     </div>
 
-    <form (ngSubmit)="onSubmit()">
+    <form class="modal-form aula-form" (ngSubmit)="onSubmit()">
       <div class="modal-body">
         <div *ngIf="errorMessage" class="alert alert-danger">
           {{ errorMessage }}
         </div>
 
         <div class="form-group">
-          <label for="inputNome">Nome / Identificação da Aula</label>
+          <label for="inputNome">Nome / Identificação da Aula <span class="required" aria-hidden="true">*</span></label>
           <input type="text" id="inputNome" class="form-control" [(ngModel)]="nome"
             name="nome" placeholder="Ex: Aula Prática 01" required [disabled]="modalLoading" />
         </div>
 
-        <div class="form-group" style="margin-top: 15px;">
-          <label for="inputData">Data e Horário</label>
+        <div class="form-group">
+          <label for="inputData">Data e Horário <span class="required" aria-hidden="true">*</span></label>
           <input type="datetime-local" id="inputData" class="form-control" [(ngModel)]="data"
             name="data" required [disabled]="modalLoading" />
         </div>
@@ -105,7 +100,7 @@
       <h3 class="modal-title">Confirmar Exclusão</h3>
       <button type="button" class="btn-close" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading" title="Fechar">&times;</button>
     </div>
-    
+
     <div class="modal-body">
       <div *ngIf="deleteErrorMessage" class="alert alert-danger">
         {{ deleteErrorMessage }}
@@ -114,7 +109,7 @@
         Tem certeza que deseja excluir esta aula? Esta ação não poderá ser desfeita.
       </p>
     </div>
-    
+
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading">
         Cancelar

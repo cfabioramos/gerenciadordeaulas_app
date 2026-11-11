@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -312,6 +312,17 @@ export class MatriculasComponent implements OnInit {
   onAlunoAtualizado(aluno: any) {
     if (aluno && aluno.nome) {
       this.alunoNome = aluno.nome;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showDeleteConfirmModal) {
+      this.showDeleteConfirmModal = false;
+      return;
+    }
+    if (this.showModal) {
+      this.showModal = false;
     }
   }
 }

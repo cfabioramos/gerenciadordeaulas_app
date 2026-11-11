@@ -54,7 +54,7 @@
   max-height: 90dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
   animation: modalFadeIn 0.25s ease-out;
   box-sizing: border-box;
 }
@@ -113,6 +113,19 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-top: 0;
+}
+
+.form-group > *:first-child {
+  margin-top: 0;
+}
+
+.form-group.label-top {
+  margin-top: 12px;
+}
+
+.form-group.label-top + .form-group {
+  margin-top: 4px;
 }
 
 .form-group label {
@@ -130,6 +143,8 @@
   transition: all 0.2s ease;
   background-color: #ffffff;
   color: #1e293b;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -167,8 +182,8 @@
   padding: 10px 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  border-radius: 8px;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: 9px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -186,27 +201,6 @@
 
 .btn-secondary:hover:not(:disabled) {
   background-color: #e2e8f0;
-}
-
-.btn-delete {
-  padding: 6px 12px;
-  background-color: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-delete:hover {
-  background-color: #b91c1c;
-  transform: translateY(-1px);
-}
-
-.btn-delete:active {
-  transform: translateY(0);
 }
 
 /* Make table rows clickable and style them */
@@ -244,4 +238,43 @@
   background-color: #f3f4f6;
   color: #9ca3af;
   cursor: not-allowed;
+}
+
+/* Pagamento form specific utilities */
+.form-group.section {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.discount-info {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Modal height adjustments for mobile */
+@media (max-width: 640px) {
+  .modal-content {
+    max-height: calc(100vh - 80px);
+    margin: 4px;
+  }
+  
+  .modal-body {
+    padding: 16px;
+  }
+  
+  .modal-footer {
+    padding: 12px 16px;
+  }
+  
+  .form-control {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .form-group label {
+    font-size: 0.85rem;
+  }
 }

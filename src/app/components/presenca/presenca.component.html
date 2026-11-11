@@ -20,9 +20,6 @@
     </div>
     <div class="filters">
       <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
-      <button (click)="toggleSort()">
-        Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
-      </button>
     </div>
   </div>
 

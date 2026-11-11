@@ -1,0 +1,104 @@
+/* Modal de cadastro/edição de aula */
+.aula-modal {
+  max-width: 520px;
+}
+
+.aula-form .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+
+.aula-form .form-group {
+  margin-bottom: 0;
+  gap: 8px;
+}
+
+.aula-form .form-group label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.01em;
+}
+
+.required {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.aula-form .form-control {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.aula-form input[type="datetime-local"].form-control {
+  cursor: pointer;
+}
+
+.aula-form .modal-footer {
+  align-items: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-primary {
+  background-color: var(--primary, #957D6A);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-light, #b09987);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #e2e8f0;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.delete-modal {
+  max-width: 440px;
+}
+
+@media (max-width: 520px) {
+  .aula-form .modal-body {
+    padding: 18px;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+    padding: 10px 12px;
+  }
+}

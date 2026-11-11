@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -200,5 +200,16 @@ export class CiclosComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showDeleteConfirmModal) {
+      this.showDeleteConfirmModal = false;
+      return;
+    }
+    if (this.showModal) {
+      this.showModal = false;
+    }
   }
 }

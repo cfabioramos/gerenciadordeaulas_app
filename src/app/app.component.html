@@ -7,17 +7,22 @@
   <!-- Header -->
   <header class="app-header" *ngIf="isLoggedIn()">
     <div class="header-content">
-      <h1>Meu Gerenciador de Presenças</h1>
+      <a class="app-brand" routerLink="/ciclos" aria-label="Meu Gerenciador de Presenças - Ir para o início">
+        <span class="brand-mark" aria-hidden="true">
+          <svg class="brand-symbol" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="21" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.5" />
+            <rect x="12.5" y="15" width="23" height="21" rx="5" stroke="currentColor" stroke-width="2.2" />
+            <path d="M12.5 21h23" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            <path d="M18.5 11.5v6M29.5 11.5v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            <path class="brand-accent-stroke" d="M18.5 27l4 4 8-9" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" />
+            <circle class="brand-accent-fill" cx="35.5" cy="12.5" r="3" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-title"><span class="brand-title-prefix">Meu</span> Gerenciador de Presenças</span>
+        </span>
+      </a>
       <div class="user-info">
-        <div class="theme-selector-container">
-          <label class="theme-label" for="headerThemeSelect">Tema:</label>
-          <select id="headerThemeSelect" class="theme-select" [value]="currentTheme" (change)="onThemeChange($event)">
-            <option value="nordeste">Nordeste</option>
-            <option value="dancacircular">Dança Circular</option>
-            <option value="forro">Forró</option>
-            <option value="frevo">Frevo</option>
-          </select>
-        </div>
         <span class="user-name">Olá, {{ getUserNome() }}</span>
         <button class="btn-logout" (click)="logout()">Sair</button>
       </div>
@@ -32,22 +37,60 @@
         <div *ngFor="let item of sidebarWatermarks" class="sidebar-watermark-item" [ngStyle]="item.style"></div>
       </div>
 
-      <!-- Cheerful Sidebar Banner -->
-      <div class="sidebar-theme-banner">
-        <div class="sidebar-theme-graphic"></div>
+      <!-- Identidade visual e seleção do tema -->
+      <div class="sidebar-theme">
+        <button type="button" class="theme-emblem" (click)="cycleTheme()"
+          [title]="'Tema atual: ' + getThemeLabel(currentTheme) + '. Clique para alternar.'"
+          [attr.aria-label]="'Tema atual: ' + getThemeLabel(currentTheme) + '. Clique para alternar tema.'">
+          <span class="theme-emblem-image" aria-hidden="true"
+            [style.background-image]="'url(/images/' + getThemeImage() + ')'"></span>
+        </button>
+        <div class="theme-emblem-copy">
+          <label class="theme-emblem-kicker" for="sidebarThemeSelect">Tema</label>
+          <select id="sidebarThemeSelect" class="theme-select sidebar-theme-select"
+            [value]="currentTheme" (change)="onThemeChange($event)">
+            <option value="nordeste">Nordeste</option>
+            <option value="dancacircular">Dança Circular</option>
+            <option value="forro">Forró</option>
+            <option value="frevo">Frevo</option>
+          </select>
+        </div>
       </div>
 
-      <nav class="nav-menu">
-        <a routerLink="/ciclos" routerLinkActive="active" class="nav-item">
-          <span class="icon">📅</span>
+      <nav class="nav-menu" aria-label="Navegação principal">
+        <a routerLink="/ciclos" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item" title="Ciclos de Aulas">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <rect x="3" y="4.5" width="18" height="16" rx="3"></rect>
+              <path d="M8 2.5v4M16 2.5v4M3 9.5h18"></path>
+              <path d="M8 13h.01M12 13h.01M16 13h.01M8 17h.01M12 17h.01M16 17h.01"></path>
+            </svg>
+          </span>
           <span class="text">Ciclos de Aulas</span>
         </a>
-        <a routerLink="/alunos" routerLinkActive="active" class="nav-item">
-          <span class="icon">🎓</span>
+
+        <a routerLink="/alunos" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item" title="Alunos e Matrículas">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </span>
           <span class="text">Alunos e Matrículas</span>
         </a>
-        <a routerLink="/dashboards" routerLinkActive="active" class="nav-item">
-          <span class="icon">📊</span>
+
+        <a routerLink="/dashboards" routerLinkActive="active" ariaCurrentWhenActive="page" class="nav-item" title="Dashboards">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" focusable="false">
+              <path d="M3 3v18h18"></path>
+              <path d="M7 15l4-4 3 3 5-6"></path>
+            </svg>
+          </span>
           <span class="text">Dashboards</span>
         </a>
       </nav>

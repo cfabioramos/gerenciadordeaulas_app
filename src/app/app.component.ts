@@ -24,11 +24,20 @@ export class AppComponent implements OnInit, OnDestroy {
   watermarks: any[] = [];        // Global / Login container
 
   // Theme asset library: 3 distinct high-fidelity regional images per theme
-  private themeAssets: { [key: string]: string[] } = {
+  private readonly themeAssets: { [key: string]: string[] } = {
     'nordeste': ['nordeste_cactus.jpg', 'nordeste_sun.jpg', 'nordeste_hat.jpg'],
     'dancacircular': ['circular_mandala.jpg', 'circular_figures.jpg', 'circular_stars.jpg'],
     'forro': ['forro_accordion.jpg', 'forro_triangle.jpg', 'forro_zabumba.jpg'],
     'frevo': ['frevo_umbrella.jpg', 'frevo_ribbons.jpg', 'frevo_dancer.jpg']
+  };
+
+  private readonly themeOrder = ['nordeste', 'dancacircular', 'forro', 'frevo'];
+
+  private readonly themeLabels: { [key: string]: string } = {
+    'nordeste': 'Nordeste',
+    'dancacircular': 'Dança Circular',
+    'forro': 'Forró',
+    'frevo': 'Frevo'
   };
 
   constructor() {
@@ -214,6 +223,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
   get currentTheme(): string {
     return localStorage.getItem('theme') || 'nordeste';
+  }
+
+  getThemeLabel(theme: string): string {
+    return this.themeLabels[theme] || theme;
+  }
+
+  getThemeImage(theme?: string): string {
+    const selectedTheme = theme || this.currentTheme;
+    const assets = this.themeAssets[selectedTheme] || this.themeAssets['nordeste'];
+    return assets[0];
+  }
+
+  cycleTheme(): void {
+    const currentTheme = this.currentTheme;
+    const currentIndex = this.themeOrder.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % this.themeOrder.length;
+    this.changeTheme(this.themeOrder[nextIndex]);
   }
 
   changeTheme(theme: string): void {

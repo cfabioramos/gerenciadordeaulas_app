@@ -3,11 +3,8 @@
     <h2 class="list-title">Alunos</h2>
     <div class="filters">
       <input type="text" placeholder="Filtrar por nome..." [(ngModel)]="searchTerm" (input)="applyFilter()" />
-      <button (click)="toggleSort()">
-        Ordenar {{ sortAscending ? 'A-Z' : 'Z-A' }}
-      </button>
-      <button *ngIf="isAdmin" class="btn-add" (click)="showNovoAlunoModal = true" title="Cadastrar Aluno">
-        +
+      <button *ngIf="isAdmin" class="btn-create" (click)="showNovoAlunoModal = true" title="Cadastrar Aluno">
+        + Novo Aluno
       </button>
     </div>
   </div>
@@ -35,4 +32,4 @@
   *ngIf="showNovoAlunoModal"
   (alunoCriado)="onAlunoCriado($event)"
   (cancelado)="showNovoAlunoModal = false">
-</app-novo-aluno>
+</app-novo-aluno>

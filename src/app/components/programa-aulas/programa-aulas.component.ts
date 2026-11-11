@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -240,6 +240,17 @@ export class ProgramaAulasComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showDeleteConfirmModal) {
+      this.showDeleteConfirmModal = false;
+      return;
+    }
+    if (this.showModal) {
+      this.showModal = false;
+    }
   }
 
   goToCiclos() {

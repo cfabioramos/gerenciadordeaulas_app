@@ -33,7 +33,7 @@
   <!-- Matrículas Tab -->
   <div *ngIf="activeTab === 'matriculas'">
     <div class="actions-header" *ngIf="isAdmin">
-      <button class="btn-add-matricula" (click)="openNovaMatriculaModal()" title="Nova Matrícula">
+      <button class="btn-create" (click)="openNovaMatriculaModal()" title="Nova Matrícula">
         + Nova Matrícula
       </button>
     </div>
@@ -173,7 +173,7 @@
       <h3 class="modal-title">Confirmar Exclusão</h3>
       <button type="button" class="btn-close" (click)="showDeleteConfirmModal = false" title="Fechar">&times;</button>
     </div>
-    
+
     <div class="modal-body">
       <div *ngIf="deleteErrorMessage" class="alert alert-danger">
         {{ deleteErrorMessage }}
@@ -182,7 +182,7 @@
         Tem certeza que deseja remover esta matrícula? Esta ação não poderá ser desfeita.
       </p>
     </div>
-    
+
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="showDeleteConfirmModal = false" [disabled]="deleteLoading">
         Cancelar

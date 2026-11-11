@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, HostListener, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
@@ -266,5 +266,16 @@ export class PagamentosComponent implements OnInit, OnChanges {
     const formattedPct = pct.toFixed(0) + '%';
     
     return `Desconto aplicado: ${formattedDiff} (${formattedPct})`;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.showDeleteConfirmModal) {
+      this.showDeleteConfirmModal = false;
+      return;
+    }
+    if (this.showModal) {
+      this.showModal = false;
+    }
   }
 }
