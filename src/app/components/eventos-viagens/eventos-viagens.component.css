@@ -1,0 +1,664 @@
+/* ==========================================================================
+   EVENTOS E VIAGENS - Estilos
+   ========================================================================== */
+
+/* Cabeçalho da Lista */
+.tipo-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tipo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: #f1f1f1;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tipo-btn:hover {
+  background-color: #e8e8e8;
+}
+
+.tipo-btn.active {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.tipo-btn .icon {
+  font-size: 1.1rem;
+}
+
+/* Modal - Rolagem vertical para visualizar todos os campos */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.25s ease-out;
+  box-sizing: border-box;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(90vh - 160px);
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary, #957D6A);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light, #b09987);
+}
+
+@keyframes modalFadeIn {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eeeeee;
+  background-color: #fcfcfc;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary, #957D6A);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #888888;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #333333;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #eeeeee;
+  background-color: #fcfcfc;
+  flex-shrink: 0;
+}
+
+/* Tabela */
+.participantes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.participante-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background-color: #e8e8e8;
+  color: #333;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.participante-vazio {
+  font-size: 0.78rem;
+  color: #999;
+  font-style: italic;
+}
+
+.descricao {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.badge-tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.acoes {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  padding: 4px 10px;
+  background-color: #f1f1f1;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  background-color: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Status badges */
+.status-agendado {
+  color: #6c757d;
+}
+
+.status-confirmado {
+  color: #28a745;
+}
+
+.status-cancelado {
+  color: #dc3545;
+}
+
+/* Modal - Seções */
+.form-group-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.section-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+  margin-top: 0;
+}
+
+.section-help {
+  font-size: 0.82rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* Datas do Evento */
+.datas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.data-fields {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.data-input,
+.horario-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-remover-data {
+  padding: 6px 10px;
+  background-color: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.btn-remover-data:hover {
+  background-color: #b91c1c;
+}
+
+.btn-adicionar-data {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-adicionar-data:hover {
+  background-color: var(--primary-light);
+}
+
+/* Viagem - Datas */
+.viagem-dates {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-pair {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Participantes */
+.participantes-secao {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.participante-grupo {
+  flex: 1;
+  min-width: 200px;
+}
+
+.participante-grupo label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 6px;
+}
+
+.select-multi {
+  height: 120px;
+  font-size: 0.85rem;
+}
+
+.novo-participante-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btn-adicionar-participante {
+  padding: 8px 16px;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.btn-adicionar-participante:hover {
+  background-color: var(--primary-light);
+}
+
+.participantes-criados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.participante-chip.selecionado {
+  background-color: var(--primary);
+  color: #fff;
+  font-size: 0.78rem;
+}
+
+.chip-remove {
+  margin-left: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.selecionados-resumo {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #f0f4f8;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.selecionado-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background-color: #e8e8e8;
+  border-radius: 12px;
+  margin-left: 6px;
+  margin-top: 4px;
+  font-size: 0.78rem;
+}
+
+/* Financeiro Modal */
+.resumo-financeiro {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.resumo-item {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.resumo-item .label {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.resumo-item .valor {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.resumo-item.receita .valor { color: #28a745; }
+.resumo-item.despesa .valor { color: #dc3545; }
+.resumo-item.saldo .valor.positivo { color: #28a745; }
+.resumo-item.saldo .valor.negativo { color: #dc3545; }
+
+.tab-financeiro {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  background-color: #f1f1f1;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background-color: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.lista-financeira {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.financeiro-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.financeiro-item:last-child {
+  border-bottom: none;
+}
+
+.financeiro-item .info {
+  flex: 1;
+}
+
+.financeiro-item .info strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.financeiro-item .info .ref {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.financeiro-item .valor {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.receita-item .valor { color: #28a745; }
+.despesa-item .valor { color: #dc3545; }
+
+.vazio {
+  text-align: center;
+  color: #999;
+  font-size: 0.85rem;
+  font-style: italic;
+  padding: 20px;
+}
+
+.form-financeiro {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.ref-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Modal Participantes */
+.participantes-lista {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.participante-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.participante-item:last-child {
+  border-bottom: none;
+}
+
+.participante-item .tipo-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  background-color: #e8e8e8;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+
+.divisor {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+.adicionar-participante h4 {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 150px;
+  margin-bottom: 0;
+}
+
+.btn-adicionar-temp {
+  padding: 10px 16px;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.btn-adicionar-temp:hover {
+  background-color: var(--primary-light);
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .tipo-selector {
+    flex-wrap: wrap;
+  }
+  
+  .participantes-secao {
+    flex-direction: column;
+  }
+  
+  .viagem-dates {
+    flex-direction: column;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .acoes {
+    flex-direction: column;
+  }
+  
+  .acoes button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .resumo-financeiro {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .financeiro-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .financeiro-item .valor {
+    align-self: flex-end;
+  }
+}

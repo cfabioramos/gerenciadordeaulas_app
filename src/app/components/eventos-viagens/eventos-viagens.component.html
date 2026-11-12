@@ -1,0 +1,515 @@
+<div class="list-container">
+  <!-- Cabeçalho da Lista -->
+  <div class="list-header">
+    <div class="tipo-selector">
+      <button
+        class="tipo-btn"
+        [class.active]="tipo === 'EVENTO'"
+        (click)="selecionarTipo('EVENTO')"
+        title="Eventos"
+      >
+        <span class="icon">📅</span>
+        <span class="label">Eventos</span>
+      </button>
+      <button
+        class="tipo-btn"
+        [class.active]="tipo === 'VIAGEM'"
+        (click)="selecionarTipo('VIAGEM')"
+        title="Viagens"
+      >
+        <span class="icon">✈️</span>
+        <span class="label">Viagens</span>
+      </button>
+    </div>
+    <h2 class="list-title">{{ tipoLabel }}</h2>
+    <div class="filters">
+      <input
+        type="text"
+        placeholder="Filtrar por título ou descrição..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      />
+      <button class="btn-create" (click)="novoItem()">
+        + Novo {{ tipoLabel }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Lista de Itens -->
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Tipo</th>
+          <th>Data / Horário</th>
+          <th>Participantes</th>
+          <th *ngIf="isAdmin">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of itensFiltrados">
+          <td>
+            <strong>{{ item.titulo }}</strong>
+            <div class="descricao">{{ item.descricao }}</div>
+          </td>
+          <td>
+            <span class="badge-tipo">{{ tipoLabelBadge(item.tipo) }}</span>
+          </td>
+          <td>
+            <ng-container *ngIf="item.tipo === 'EVENTO'; else viagemTemplate">
+              <div *ngFor="let d of item.datas">
+                {{ formatarDataBR(d.data) }} às {{ d.horario }}
+              </div>
+            </ng-container>
+            <ng-template #viagemTemplate>
+              <div>Saída: {{ formatarDataBR(item.dataSaida) }} às {{ item.horarioSaida }}</div>
+              <div>Retorno: {{ formatarDataBR(item.dataRetorno) }} às {{ item.horarioRetorno }}</div>
+            </ng-template>
+          </td>
+          <td>
+            <div class="participantes-list">
+              <span *ngFor="let p of item.participantes" class="participante-chip">
+                {{ p.nome }}
+              </span>
+              <span *ngIf="item.participantes.length === 0" class="participante-vazio">—</span>
+            </div>
+          </td>
+          <td *ngIf="isAdmin">
+            <div class="acoes">
+              <button class="btn-edit" (click)="editarItem(item)" title="Editar">Editar</button>
+              <button class="btn-delete" (click)="excluirItem(item)" title="Excluir">Excluir</button>
+              <button class="btn-action" (click)="abrirParticipantes(item)" title="Participantes">Participantes</button>
+              <button class="btn-action" (click)="abrirDetalhesFinanceiros(item)" title="Financeiro">Receitas/Despesas</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="itensFiltrados.length === 0">
+          <td [attr.colspan]="isAdmin ? 6 : 5" style="text-align: center;">
+            Nenhum {{ tipoLabel.toLowerCase() }} encontrado.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de Cadastro/Edição -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ editingItem ? 'Editar' : 'Novo' }} {{ tipoLabelBadge(formTipo) }}</h3>
+      <button type="button" class="btn-close" (click)="showModal = false" title="Fechar">&times;</button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título <span class="required" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="inputTitulo"
+            class="form-control"
+            [(ngModel)]="formTitulo"
+            name="titulo"
+            required
+            placeholder="Ex: Workshop de Forró 2026"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Descrição <span class="required" aria-hidden="true">*</span></label>
+          <textarea
+            id="inputDescricao"
+            class="form-control"
+            [(ngModel)]="formDescricao"
+            name="descricao"
+            required
+            rows="3"
+            placeholder="Descreva o evento ou viagem..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Local</label>
+          <input
+            type="text"
+            id="inputLocal"
+            class="form-control"
+            [(ngModel)]="formLocal"
+            name="local"
+            placeholder="Ex: Salão de Dança"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select
+            id="inputStatus"
+            class="form-control"
+            [(ngModel)]="formStatus"
+            name="status"
+          >
+            <option value="AGENDADO">Agendado</option>
+            <option value="CONFIRMADO">Confirmado</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
+
+        <!-- Específico para Evento -->
+        <div *ngIf="formTipo === 'EVENTO'" class="form-group-section">
+          <label class="section-title">Datas e Horários de Realização</label>
+          <p class="section-help">Adicione uma ou mais datas com seus respectivos horários.</p>
+
+          <div class="datas-container">
+            <div
+              *ngFor="let d of formDatas; let i = index"
+              class="data-item"
+            >
+              <div class="data-fields">
+                <input
+                  type="date"
+                  class="form-control data-input"
+                  [(ngModel)]="d.data"
+                  [name]="'data_' + i"
+                  placeholder="DD/MM/AAAA"
+                />
+                <input
+                  type="time"
+                  class="form-control horario-input"
+                  [(ngModel)]="d.horario"
+                  [name]="'horario_' + i"
+                  placeholder="HH:MM"
+                />
+              </div>
+              <button type="button" class="btn-remover-data" (click)="removerDataEvento(i)" title="Remover data">×</button>
+            </div>
+          </div>
+          <button type="button" class="btn-adicionar-data" (click)="adicionarDataEvento()">
+            + Adicionar Data e Horário
+          </button>
+        </div>
+
+        <!-- Específico para Viagem -->
+        <div *ngIf="formTipo === 'VIAGEM'" class="form-group-section">
+          <label class="section-title">Saída e Retorno</label>
+
+          <div class="viagem-dates">
+            <div class="date-pair">
+              <div class="form-group">
+                <label>Data e Horário de Saída <span class="required" aria-hidden="true">*</span></label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  [(ngModel)]="formDataSaida"
+                  name="dataSaida"
+                  required
+                />
+              </div>
+            </div>
+            <div class="date-pair">
+              <div class="form-group">
+                <label>Data e Horário de Retorno <span class="required" aria-hidden="true">*</span></label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  [(ngModel)]="formDataRetorno"
+                  name="dataRetorno"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participantes -->
+        <div class="form-group-section">
+          <label class="section-title">Participantes</label>
+          <p class="section-help">Associe alunos cadastrados ou crie novos participantes.</p>
+
+          <div class="participantes-secao">
+            <div class="participante-grupo">
+              <label>Alunos Cadastrados</label>
+              <select
+                multiple
+                class="form-control select-multi"
+                [(ngModel)]="selectedAlunos"
+                name="alunos"
+              >
+                <option *ngFor="let aluno of alunos" [value]="aluno.id">
+                  {{ aluno.nome }}
+                </option>
+              </select>
+            </div>
+
+            <div class="participante-grupo">
+              <label>Novos Participantes (apenas Nome)</label>
+              <div class="novo-participante-input">
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="novoParticipanteNome"
+                  name="novoParticipante"
+                  placeholder="Nome do novo participante"
+                />
+                <button type="button" class="btn-adicionar-participante" (click)="adicionarParticipante()">
+                  + Adicionar
+                </button>
+              </div>
+              <div class="participantes-criados">
+                <span
+                  *ngFor="let p of participantesCriados"
+                  class="participante-chip selecionado"
+                  [class.selecionado]="selectedParticipantes.includes(p.id)"
+                  (click)="toggleParticipante(p.id)"
+                >
+                  {{ p.nome }}
+                  <span *ngIf="selectedParticipantes.includes(p.id)" class="chip-remove" (click)="$event.stopPropagation(); removerParticipanteSelecionado(p.id, 'PARTICIPANTE')">×</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="selecionados-resumo" *ngIf="selectedAlunos.length > 0 || selectedParticipantes.length > 0">
+            <strong>Selecionados:</strong>
+            <span
+              *ngFor="let id of selectedAlunos"
+              class="selecionado-chip"
+            >
+              {{ getNomeAluno(id) }}
+              <span class="chip-remove" (click)="removerParticipanteSelecionado(id, 'ALUNO')">×</span>
+            </span>
+            <span
+              *ngFor="let id of selectedParticipantes"
+              class="selecionado-chip"
+            >
+              {{ getNomeParticipante(id) }}
+              <span class="chip-remove" (click)="removerParticipanteSelecionado(id, 'PARTICIPANTE')">×</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showModal = false">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+          {{ modalLoading ? 'Salvando...' : (editingItem ? 'Salvar Alterações' : 'Confirmar') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de Detalhes Financeiros (Receitas e Despesas) -->
+<div class="modal-backdrop" *ngIf="showFinanceiroModal" (click)="showFinanceiroModal = false">
+  <div class="modal-content financeiro-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        {{ selectedItemForDetails?.titulo }} - {{ modalTipo === 'RECEITA' ? 'Receitas' : 'Despesas' }}
+      </h3>
+      <button type="button" class="btn-close" (click)="showFinanceiroModal = false" title="Fechar">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Resumo financeiro -->
+      <div class="resumo-financeiro">
+        <div class="resumo-item receita">
+          <span class="label">Total Receitas</span>
+          <span class="valor">{{ formatarMoeda(totalReceitas) }}</span>
+        </div>
+        <div class="resumo-item despesa">
+          <span class="label">Total Despesas</span>
+          <span class="valor">{{ formatarMoeda(totalDespesas) }}</span>
+        </div>
+        <div class="resumo-item saldo">
+          <span class="label">Saldo</span>
+          <span class="valor" [class.positivo]="saldo >= 0" [class.negativo]="saldo < 0">
+            {{ formatarMoeda(saldo) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="tab-financeiro">
+        <button
+          class="tab-btn"
+          [class.active]="modalTipo === 'RECEITA'"
+          (click)="modalTipo = 'RECEITA'"
+        >
+          Receitas
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="modalTipo === 'DESPESA'"
+          (click)="modalTipo = 'DESPESA'"
+        >
+          Despesas
+        </button>
+      </div>
+
+      <!-- Lista de itens financeiros -->
+      <div class="lista-financeira">
+        <div *ngIf="modalTipo === 'RECEITA'; else despesasTemplate">
+          <div
+            *ngFor="let r of selectedItemForDetails?.receitas"
+            class="financeiro-item receita-item"
+          >
+            <div class="info">
+              <strong>{{ r.descricao }}</strong>
+              <span class="ref">{{ getDescricaoReferencia(r.tipo, r.nomeReferencia) }}</span>
+            </div>
+            <span class="valor">{{ formatarMoeda(r.valor) }}</span>
+            <button class="btn-remover" (click)="removerReceita(r.id)" title="Remover">×</button>
+          </div>
+          <div *ngIf="!selectedItemForDetails?.receitas?.length" class="vazio">Nenhuma receita cadastrada.</div>
+        </div>
+
+        <ng-template #despesasTemplate>
+          <div
+            *ngFor="let d of selectedItemForDetails?.despesas"
+            class="financeiro-item despesa-item"
+          >
+            <div class="info">
+              <strong>{{ d.descricao }}</strong>
+            </div>
+            <span class="valor">{{ formatarMoeda(d.valor) }}</span>
+            <button class="btn-remover" (click)="removerDespesa(d.id)" title="Remover">×</button>
+          </div>
+          <div *ngIf="!selectedItemForDetails?.despesas?.length" class="vazio">Nenhuma despesa cadastrada.</div>
+        </ng-template>
+      </div>
+
+      <!-- Formulário para adicionar -->
+      <div class="form-financeiro">
+        <form (ngSubmit)="salvarFinanceiro()">
+          <div class="form-group">
+            <label>Descrição <span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="formDescricaoFinanceiro"
+              name="descricaoFinanceiro"
+              required
+              placeholder="Ex: Inscrição, Passagem, Aluguel..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Valor (R$) <span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="formValorFinanceiro"
+              name="valorFinanceiro"
+              required
+              min="0.01"
+              step="0.01"
+              placeholder="0,00"
+            />
+          </div>
+
+          <div *ngIf="modalTipo === 'RECEITA'" class="form-group">
+            <label>Referência <span class="required" aria-hidden="true">*</span></label>
+            <div class="ref-selector">
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="formTipoReferencia" name="tipoRef" value="ALUNO" />
+                Aluno
+              </label>
+              <label class="radio-label">
+                <input type="radio" [(ngModel)]="formTipoReferencia" name="tipoRef" value="PARTICIPANTE" />
+                Participante
+              </label>
+            </div>
+            <select
+              class="form-control"
+              [(ngModel)]="formReferenciaId"
+              name="referenciaId"
+            >
+              <option *ngFor="let a of alunos" [value]="a.id">
+                Aluno: {{ a.nome }}
+              </option>
+              <option *ngFor="let p of participantesCriados" [value]="p.id">
+                Participante: {{ p.nome }}
+              </option>
+            </select>
+          </div>
+
+          <div class="modal-footer-actions">
+            <button type="button" class="btn btn-secondary" (click)="showFinanceiroModal = false">
+              Fechar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="modalLoading">
+              {{ modalTipo === 'RECEITA' ? 'Adicionar Receita' : 'Adicionar Despesa' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Participantes -->
+<div class="modal-backdrop" *ngIf="showParticipantesModal" (click)="showParticipantesModal = false">
+  <div class="modal-content participantes-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Participantes - {{ selectedItemForDetails?.titulo }}</h3>
+      <button type="button" class="btn-close" (click)="showParticipantesModal = false" title="Fechar">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="participantes-lista">
+        <div class="participante-item" *ngFor="let p of (selectedItemForDetails?.participantes || [])">
+          <span class="tipo-badge">{{ p.tipo === 'ALUNO' ? 'Aluno' : 'Participante' }}</span>
+          <span class="nome">{{ p.nome }}</span>
+          <button class="btn-remover" (click)="removerParticipanteSelecionado(p.id, p.tipo)" title="Remover">×</button>
+        </div>
+        <div *ngIf="!(selectedItemForDetails?.participantes?.length)" class="vazio">Nenhum participante associado.</div>
+      </div>
+
+      <hr class="divisor" />
+
+      <div class="adicionar-participante">
+        <h4>Adicionar Participante</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Alunos Cadastrados</label>
+            <select
+              class="form-control"
+              [(ngModel)]="selectedAlunosTemp"
+              name="alunosTemp"
+            >
+              <option *ngFor="let a of alunos" [value]="a.id">
+                {{ a.nome }}
+              </option>
+            </select>
+          </div>
+          <button class="btn-adicionar-temp" (click)="adicionarAlunoTemp()">+ Adicionar Aluno</button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Novo Participante (apenas Nome)</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="novoParticipanteNome"
+              name="novoPartTemp"
+              placeholder="Nome do participante"
+            />
+          </div>
+          <button class="btn-adicionar-temp" (click)="adicionarParticipanteNovoTemp()">+ Adicionar Participante</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showParticipantesModal = false">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-primary" (click)="salvarParticipantes()">
+        Salvar Participantes
+      </button>
+    </div>
+  </div>
+</div>

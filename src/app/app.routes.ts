@@ -6,6 +6,7 @@ import { PresencaComponent } from './components/presenca/presenca.component';
 import { AlunosComponent } from './components/alunos/alunos.component';
 import { MatriculasComponent } from './components/matriculas/matriculas.component';
 import { DashboardsComponent } from './components/dashboards/dashboards.component';
+import { EventosViagensComponent } from './components/eventos-viagens/eventos-viagens.component';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -20,6 +21,8 @@ export const routes: Routes = [
   { path: 'presenca', component: PresencaComponent, canActivate: [authGuard] },
   { path: 'alunos', component: AlunosComponent, canActivate: [authGuard] },
   { path: 'alunos/:alunoId/matriculas', component: MatriculasComponent, canActivate: [authGuard] },
+  { path: 'eventos', component: EventosViagensComponent, canActivate: [authGuard] },
+  { path: 'viagens', component: EventosViagensComponent, canActivate: [authGuard] },
   { path: 'dashboards', component: DashboardsComponent, canActivate: [authGuard] },
   { path: '', redirectTo: '/ciclos', pathMatch: 'full' },
   { path: '**', redirectTo: '/ciclos' }
