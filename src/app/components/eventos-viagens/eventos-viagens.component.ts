@@ -1,6 +1,9 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import {ActivatedRoute} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {EventosTabService} from '../../services/eventos-tab.service';
 
 interface EventoItem {
   id: number;
@@ -34,7 +37,7 @@ interface AlunoMock {
   templateUrl: './eventos-viagens.component.html',
   styleUrl: './eventos-viagens.component.css'
 })
-export class EventosViagensComponent implements OnInit {
+export class EventosViagensComponent implements OnInit, OnDestroy {
 
   // Estados da tela
   tipo: 'EVENTO' | 'VIAGEM' | null = null;
@@ -163,8 +166,26 @@ export class EventosViagensComponent implements OnInit {
   formTipoReferencia: 'ALUNO' | 'PARTICIPANTE' = 'ALUNO';
   formReferenciaId: number | null = null;
 
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly eventosTab: EventosTabService
+  ) {}
+
+  private tabSub: Subscription | null = null;
+
   ngOnInit(): void {
-    // Dados já carregados estaticamente
+    // Sincroniza com a seleção do menu lateral (funciona mesmo quando
+    // a rota /eventos já está ativa e o componente não é recriado)
+    this.tabSub = this.eventosTab.tab$.subscribe(t => this.tipo = t);
+
+    // Aba inicial conforme a rota de acesso:
+    // /eventos → aba Eventos | /viagens → aba Viagens
+    const path = this.route.snapshot.url.map(seg => seg.path).join('/');
+    this.tipo = path === 'viagens' ? 'VIAGEM' : 'EVENTO';
+  }
+
+  ngOnDestroy(): void {
+    this.tabSub?.unsubscribe();
   }
 
   @HostListener('document:keydown.escape', ['$event'])

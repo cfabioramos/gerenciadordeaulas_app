@@ -2,6 +2,7 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { EventosTabService } from './services/eventos-tab.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -13,6 +14,7 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
+  protected eventosTab = inject(EventosTabService);
   private themeSub: Subscription | null = null;
   
   title = 'gerenciadordeaulas_app';
