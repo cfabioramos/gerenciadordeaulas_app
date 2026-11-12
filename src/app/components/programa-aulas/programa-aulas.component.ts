@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -106,7 +107,7 @@ export class ProgramaAulasComponent implements OnInit {
         this.tipoAulas = data || [];
       },
       error: (err) => {
-        console.error('Erro ao carregar tipos de aula:', err);
+        AppLogger.error('Erro ao carregar tipos de aula:', err);
       }
     });
   }
@@ -195,7 +196,7 @@ export class ProgramaAulasComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao atualizar programa de aulas.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     } else {
@@ -208,7 +209,7 @@ export class ProgramaAulasComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao criar programa de aulas.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     }
@@ -237,7 +238,7 @@ export class ProgramaAulasComponent implements OnInit {
       error: (err) => {
         this.deleteLoading = false;
         this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir o programa de aulas pois existem aulas vinculadas a ele.';
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }

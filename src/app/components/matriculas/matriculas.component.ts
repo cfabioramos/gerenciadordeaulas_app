@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -73,7 +74,7 @@ export class MatriculasComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Erro ao carregar informações do aluno:', err);
+        AppLogger.error('Erro ao carregar informações do aluno:', err);
       }
     });
   }
@@ -114,7 +115,7 @@ export class MatriculasComponent implements OnInit {
       error: (err) => {
         this.errorMessage = 'Erro ao carregar ciclos.';
         this.modalLoading = false;
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }
@@ -132,7 +133,7 @@ export class MatriculasComponent implements OnInit {
         error: (err) => {
           this.errorMessage = 'Erro ao carregar programas de aula.';
           this.modalLoading = false;
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     }
@@ -156,7 +157,7 @@ export class MatriculasComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao atualizar matrícula.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
       return;
@@ -189,7 +190,7 @@ export class MatriculasComponent implements OnInit {
       error: (err) => {
         this.modalLoading = false;
         this.errorMessage = 'Erro ao cadastrar matrícula.';
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }
@@ -220,7 +221,7 @@ export class MatriculasComponent implements OnInit {
         } else {
           this.deleteErrorMessage = 'Erro ao remover matrícula.';
         }
-        console.error('Erro ao deletar matrícula:', err);
+        AppLogger.error('Erro ao deletar matrícula:', err);
       }
     });
   }
@@ -251,7 +252,7 @@ export class MatriculasComponent implements OnInit {
         // Status updated successfully
       },
       error: (err) => {
-        console.error('Erro ao atualizar status da matrícula:', err);
+        AppLogger.error('Erro ao atualizar status da matrícula:', err);
         matricula.flAtivo = previousState;
         if (input) {
           input.checked = previousState;

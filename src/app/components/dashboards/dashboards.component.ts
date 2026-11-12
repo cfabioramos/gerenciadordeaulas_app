@@ -1,4 +1,5 @@
 import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
@@ -200,12 +201,12 @@ export class DashboardsComponent implements OnInit {
   loadFilterOptions(): void {
     this.service.getCiclos().subscribe({
       next: (data) => this.ciclos = data || [],
-      error: (err) => console.error('Erro ao carregar ciclos para filtro:', err)
+      error: (err) => AppLogger.error('Erro ao carregar ciclos para filtro:', err)
     });
 
     this.service.getAlunos().subscribe({
       next: (data) => this.alunos = data || [],
-      error: (err) => console.error('Erro ao carregar alunos para filtro:', err)
+      error: (err) => AppLogger.error('Erro ao carregar alunos para filtro:', err)
     });
   }
 
@@ -218,7 +219,7 @@ export class DashboardsComponent implements OnInit {
         this.applyFinancialFilters();
       },
       error: (err) => {
-        console.error('Erro ao carregar pagamentos:', err);
+        AppLogger.error('Erro ao carregar pagamentos:', err);
         this.loadingFinanceiro = false;
       }
     });
@@ -492,8 +493,8 @@ export class DashboardsComponent implements OnInit {
 
   sortFinancialTable(): void {
     this.filteredPagamentos.sort((a, b) => {
-      let valA: any = a[this.sortColumn];
-      let valB: any = b[this.sortColumn];
+      const valA: any = a[this.sortColumn];
+      const valB: any = b[this.sortColumn];
 
       if (this.sortColumn === 'data') {
         const dateA = this.parseDate(a.data).getTime();

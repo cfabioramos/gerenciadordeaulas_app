@@ -1,7 +1,6 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import {Component, HostListener, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 interface EventoItem {
   id: number;
@@ -31,7 +30,7 @@ interface AlunoMock {
 @Component({
   selector: 'app-eventos-viagens',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './eventos-viagens.component.html',
   styleUrl: './eventos-viagens.component.css'
 })
@@ -142,10 +141,10 @@ export class EventosViagensComponent implements OnInit {
   formDescricao = '';
   formLocal = '';
   formStatus = 'AGENDADO';
-  
+
   // Para Evento: array de datas/horários
   formDatas: Array<{ data: string; horario: string }> = [];
-  
+
   // Para Viagem: saída e retorno
   formDataSaida = '';
   formHorarioSaida = '';
@@ -169,7 +168,7 @@ export class EventosViagensComponent implements OnInit {
   }
 
   @HostListener('document:keydown.escape', ['$event'])
-  onEscapeKey(event: KeyboardEvent): void {
+  onEscapeKey(_event: KeyboardEvent): void {
     if (this.showModal) {
       this.showModal = false;
     }
@@ -183,10 +182,6 @@ export class EventosViagensComponent implements OnInit {
 
   get tipoLabel(): string {
     return this.tipo === 'VIAGEM' ? 'Viagens' : 'Eventos';
-  }
-
-  get tipoIcon(): string {
-    return this.tipo === 'VIAGEM' ? 'viagem' : 'evento';
   }
 
   get itensFiltrados(): EventoItem[] {
@@ -374,11 +369,14 @@ export class EventosViagensComponent implements OnInit {
 
   salvarParticipantes(): void {
     if (!this.selectedItemForDetails) return;
-    const participantes = [
-      ...this.selectedAlunos.map(id => ({ id, nome: this.alunos.find(a => a.id === id)!.nome, tipo: 'ALUNO' as const })),
-      ...this.selectedParticipantes.map(id => ({ id, nome: this.participantesCriados.find(p => p.id === id)!.nome, tipo: 'PARTICIPANTE' as const }))
+    this.selectedItemForDetails.participantes = [
+      ...this.selectedAlunos.map(id => ({id, nome: this.alunos.find(a => a.id === id)!.nome, tipo: 'ALUNO' as const})),
+      ...this.selectedParticipantes.map(id => ({
+        id,
+        nome: this.participantesCriados.find(p => p.id === id)!.nome,
+        tipo: 'PARTICIPANTE' as const
+      }))
     ];
-    this.selectedItemForDetails.participantes = participantes;
     this.showParticipantesModal = false;
     this.selectedItemForDetails = null;
   }
@@ -450,19 +448,6 @@ export class EventosViagensComponent implements OnInit {
 
   tipoLabelBadge(tipo: 'EVENTO' | 'VIAGEM'): string {
     return tipo === 'EVENTO' ? 'Evento' : 'Viagem';
-  }
-
-  statusClass(status: string): string {
-    switch (status) {
-      case 'AGENDADO': return 'status-agendado';
-      case 'CONFIRMADO': return 'status-confirmado';
-      case 'CANCELADO': return 'status-cancelado';
-      default: return 'status-agendado';
-    }
-  }
-
-  getParticipanteLabel(p: { tipo: 'ALUNO' | 'PARTICIPANTE'; nome: string }): string {
-    return `${p.tipo === 'ALUNO' ? 'Aluno' : 'Participante'}: ${p.nome}`;
   }
 
   formatarMoeda(valor: number | undefined): string {

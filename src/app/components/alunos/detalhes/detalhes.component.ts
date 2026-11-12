@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { AppLogger } from '../../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../../services/gerenciador-aulas.service';
 import { AuthService } from '../../../services/auth.service';
+import { Aluno } from '../../../models/aluno.model';
 
 @Component({
   selector: 'app-detalhes',
@@ -13,7 +15,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class DetalhesComponent implements OnInit, OnChanges {
   @Input() alunoId!: number;
-  @Output() alunoAtualizado = new EventEmitter<any>();
+  @Output() alunoAtualizado = new EventEmitter<Aluno>();
 
   alunoNome: string = '';
   originalNome: string = '';
@@ -55,7 +57,7 @@ export class DetalhesComponent implements OnInit, OnChanges {
       error: (err) => {
         this.errorMessage = 'Erro ao carregar dados do aluno.';
         this.loading = false;
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }
@@ -80,13 +82,13 @@ export class DetalhesComponent implements OnInit, OnChanges {
         this.originalNome = res.nome;
         this.alunoNome = res.nome;
         this.successMessage = 'Nome do aluno atualizado com sucesso!';
-        this.alunoAtualizado.emit(res);
+        this.alunoAtualizado.emit(res as Aluno);
         setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = 'Erro ao atualizar nome do aluno.';
-        console.error('Erro ao atualizar aluno:', err);
+        AppLogger.error('Erro ao atualizar aluno:', err);
       }
     });
   }

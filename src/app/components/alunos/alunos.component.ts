@@ -67,7 +67,7 @@ export class AlunosComponent implements OnInit {
     this.router.navigate(['/alunos', aluno.id, 'matriculas']);
   }
 
-  onAlunoCriado(novoAluno: any) {
+  onAlunoCriado(_novoAluno?: any) {
     this.showNovoAlunoModal = false;
     this.loadAlunos();
   }

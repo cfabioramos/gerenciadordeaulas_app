@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../environments/environment';
-import { Matricula } from '../components/presenca/presenca.component';
+import { Matricula } from '../models/matricula.model';
 
 export { API_URL };
 

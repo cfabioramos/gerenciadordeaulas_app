@@ -1,9 +1,10 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
-import { AuthService } from '../../services/auth.service';
+import {Component, HostListener, OnInit} from '@angular/core';
+import {AppLogger} from '../../utils/app-logger';
+import {CommonModule, Location} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {GerenciadorAulasService} from '../../services/gerenciador-aulas.service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-aulas',
@@ -103,7 +104,7 @@ export class AulasComponent implements OnInit {
   }
 
   applyFilter() {
-    this.filteredAulas = this.aulas.filter(a => 
+    this.filteredAulas = this.aulas.filter(a =>
       a.nome?.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
     this.sortData();
@@ -182,13 +183,12 @@ export class AulasComponent implements OnInit {
     this.isEditing = false;
     this.editingAulaId = null;
     this.nome = '';
-    
+
     // Default data field to current date/time in YYYY-MM-DDTHH:mm format
     const now = new Date();
     const tzOffset = now.getTimezoneOffset() * 60000;
-    const localISOTime = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 16);
-    this.data = localISOTime;
-    
+    this.data = (new Date(now.getTime() - tzOffset)).toISOString().slice(0, 16);
+
     this.errorMessage = '';
     this.showModal = true;
   }
@@ -237,7 +237,7 @@ export class AulasComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao atualizar aula.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     } else {
@@ -250,7 +250,7 @@ export class AulasComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao criar aula.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     }
@@ -279,7 +279,7 @@ export class AulasComponent implements OnInit {
       error: (err) => {
         this.deleteLoading = false;
         this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir a aula pois existem presenças registradas.';
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }

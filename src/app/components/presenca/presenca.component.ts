@@ -1,21 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
 import { AuthService } from '../../services/auth.service';
-
-export interface Matricula {
-  alunoId: number;
-  alunoNome: string;
-  data: string;
-  id: number;
-  presencaId: number | null;
-  presente: boolean;
-  programaAulaId: number;
-  programaAulaNome: string;
-  flAtivo?: boolean;
-}
+import { Matricula } from '../../models/matricula.model';
 
 @Component({
   selector: 'app-presenca',
@@ -100,7 +90,7 @@ export class PresencaComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Erro ao carregar detalhes da aula:', err);
+        AppLogger.error('Erro ao carregar detalhes da aula:', err);
       }
     });
   }
@@ -129,7 +119,7 @@ export class PresencaComponent implements OnInit {
 
   applyFilter() {
     const term = this.searchTerm.toLowerCase();
-    
+
     // Separate active and inactive matriculas
     const ativas = this.matriculas.filter(m => m.flAtivo !== false && (m.alunoNome?.toLowerCase().includes(term) ?? false));
     const inativas = this.matriculas.filter(m => m.flAtivo === false && (m.alunoNome?.toLowerCase().includes(term) ?? false));
@@ -157,7 +147,7 @@ export class PresencaComponent implements OnInit {
   onTogglePresenca(matricula: Matricula, event?: Event) {
     if (!this.canEditPresenca(matricula)) {
       if (event && event.target) {
-        (event.target as HTMLInputElement).checked = !!matricula.presente;
+        (event.target as HTMLInputElement).checked = matricula.presente;
       }
       return;
     }
@@ -181,7 +171,7 @@ export class PresencaComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Erro ao registrar presença', err);
+          AppLogger.error('Erro ao registrar presença', err);
           this.errorMessage = err.error?.message || err.error?.error || 'Erro ao registrar presença.';
           matricula.presente = originalState; // Reverte na UI
           if (target) target.checked = originalState;
@@ -196,7 +186,7 @@ export class PresencaComponent implements OnInit {
             matricula.presencaId = null;
           },
           error: (err) => {
-            console.error('Erro ao remover presença', err);
+            AppLogger.error('Erro ao remover presença', err);
             this.errorMessage = err.error?.message || err.error?.error || 'Erro ao remover presença.';
             matricula.presente = originalState; // Reverte na UI
             if (target) target.checked = originalState;

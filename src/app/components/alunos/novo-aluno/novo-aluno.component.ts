@@ -1,7 +1,9 @@
 import { Component, EventEmitter, HostListener, Output } from '@angular/core';
+import { AppLogger } from '../../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../../services/gerenciador-aulas.service';
+import { Aluno } from '../../../models/aluno.model';
 
 @Component({
   selector: 'app-novo-aluno',
@@ -15,7 +17,7 @@ export class NovoAlunoComponent {
   loading: boolean = false;
   errorMessage: string = '';
 
-  @Output() alunoCriado = new EventEmitter<any>();
+  @Output() alunoCriado = new EventEmitter<Aluno>();
   @Output() cancelado = new EventEmitter<void>();
 
   constructor(private service: GerenciadorAulasService) {}
@@ -37,12 +39,12 @@ export class NovoAlunoComponent {
       next: (res) => {
         this.loading = false;
         this.nome = '';
-        this.alunoCriado.emit(res);
+        this.alunoCriado.emit(res as Aluno);
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = 'Erro ao cadastrar aluno.';
-        console.error('Erro ao cadastrar aluno:', err);
+        AppLogger.error('Erro ao cadastrar aluno:', err);
       }
     });
   }

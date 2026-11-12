@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -57,7 +58,7 @@ export class CiclosComponent implements OnInit {
         this.applyFilter();
       },
       error: (err) => {
-        console.error('Erro ao carregar ciclos:', err);
+        AppLogger.error('Erro ao carregar ciclos:', err);
       }
     });
   }
@@ -155,7 +156,7 @@ export class CiclosComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao atualizar ciclo.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     } else {
@@ -168,7 +169,7 @@ export class CiclosComponent implements OnInit {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao criar ciclo.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     }
@@ -197,7 +198,7 @@ export class CiclosComponent implements OnInit {
       error: (err) => {
         this.deleteLoading = false;
         this.deleteErrorMessage = err.error?.message || err.error?.error || 'Não é possível excluir o ciclo de aulas pois existem programas de aula vinculados a ele.';
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }

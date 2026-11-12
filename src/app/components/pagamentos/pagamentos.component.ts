@@ -1,4 +1,5 @@
 import { Component, HostListener, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
@@ -65,7 +66,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
         this.pagamentos = data || [];
       },
       error: (err) => {
-        console.error('Erro ao carregar pagamentos:', err);
+        AppLogger.error('Erro ao carregar pagamentos:', err);
       }
     });
   }
@@ -81,7 +82,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
         });
       },
       error: (err) => {
-        console.error('Erro ao carregar matrículas:', err);
+        AppLogger.error('Erro ao carregar matrículas:', err);
       }
     });
   }
@@ -162,7 +163,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao editar pagamento.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     } else {
@@ -191,7 +192,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
         error: (err) => {
           this.modalLoading = false;
           this.errorMessage = 'Erro ao registrar pagamento.';
-          console.error(err);
+          AppLogger.error(err);
         }
       });
     }
@@ -219,7 +220,7 @@ export class PagamentosComponent implements OnInit, OnChanges {
       error: (err) => {
         this.deleteLoading = false;
         this.deleteErrorMessage = 'Erro ao estornar pagamento.';
-        console.error('Erro ao deletar pagamento:', err);
+        AppLogger.error('Erro ao deletar pagamento:', err);
       }
     });
   }

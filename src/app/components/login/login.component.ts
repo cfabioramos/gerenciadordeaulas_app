@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { AppLogger } from '../../utils/app-logger';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -58,7 +59,7 @@ export class LoginComponent implements OnInit {
         } else {
           this.errorMessage = 'Erro ao realizar login. Verifique suas credenciais.';
         }
-        console.error(err);
+        AppLogger.error(err);
       }
     });
   }
