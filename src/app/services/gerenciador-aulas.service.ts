@@ -2,7 +2,22 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL } from '../../environments/environment';
-import { Matricula } from '../models/matricula.model';
+import { Aluno } from '../models/aluno.model';
+import { Aula, AulaPayload } from '../models/aula.model';
+import { Ciclo, CicloPayload } from '../models/ciclo.model';
+import {
+  Matricula,
+  CadastroMatriculaPayload,
+  AtualizarMatriculaPayload
+} from '../models/matricula.model';
+import {
+  Pagamento,
+  CadastroPagamentoPayload,
+  EditarPagamentoPayload
+} from '../models/pagamento.model';
+import { Presenca } from '../models/presenca.model';
+import { ProgramaAula, ProgramaAulaPayload } from '../models/programa-aula.model';
+import { TipoAula } from '../models/tipo-aula.model';
 
 export { API_URL };
 
@@ -13,79 +28,130 @@ export class GerenciadorAulasService {
 
   constructor(private http: HttpClient) { }
 
-  getCiclos(): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/ciclos`);
+  // Ciclos
+  getCiclos(): Observable<Ciclo[]> {
+    return this.http.get<Ciclo[]>(`${API_URL}/ciclos`);
   }
 
-  getCicloPorId(id: number): Observable<any> {
-    return this.http.get<any>(`${API_URL}/ciclos/${id}`);
+  getCicloPorId(id: number): Observable<Ciclo> {
+    return this.http.get<Ciclo>(`${API_URL}/ciclos/${id}`);
   }
 
-  getProgramaAulas(cicloId?: number): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/programa-aulas/ciclo/${cicloId}`);
+  criarCiclo(ciclo: CicloPayload): Observable<Ciclo> {
+    return this.http.post<Ciclo>(`${API_URL}/ciclos`, ciclo);
   }
 
-  getAulas(programaId?: number): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/aulas/programaAula/${programaId}`);
+  atualizarCiclo(id: number, ciclo: CicloPayload): Observable<Ciclo> {
+    return this.http.put<Ciclo>(`${API_URL}/ciclos/${id}`, ciclo);
   }
 
+  deletarCiclo(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/ciclos/${id}`);
+  }
+
+  // Programas de Aulas
+  getProgramaAulas(cicloId?: number): Observable<ProgramaAula[]> {
+    return this.http.get<ProgramaAula[]>(`${API_URL}/programa-aulas/ciclo/${cicloId}`);
+  }
+
+  getTipoAulas(): Observable<TipoAula[]> {
+    return this.http.get<TipoAula[]>(`${API_URL}/tipo-aulas`);
+  }
+
+  criarProgramaAula(programa: ProgramaAulaPayload): Observable<ProgramaAula> {
+    return this.http.post<ProgramaAula>(`${API_URL}/programa-aulas`, programa);
+  }
+
+  atualizarProgramaAula(id: number, programa: ProgramaAulaPayload): Observable<ProgramaAula> {
+    return this.http.put<ProgramaAula>(`${API_URL}/programa-aulas/${id}`, programa);
+  }
+
+  deletarProgramaAula(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/programa-aulas/${id}`);
+  }
+
+  // Aulas
+  getAulas(programaId?: number): Observable<Aula[]> {
+    return this.http.get<Aula[]>(`${API_URL}/aulas/programaAula/${programaId}`);
+  }
+
+  getAulaPorId(id: number): Observable<Aula> {
+    return this.http.get<Aula>(`${API_URL}/aulas/${id}`);
+  }
+
+  criarAula(aula: AulaPayload): Observable<Aula> {
+    return this.http.post<Aula>(`${API_URL}/aulas`, aula);
+  }
+
+  atualizarAula(id: number, aula: AulaPayload): Observable<Aula> {
+    return this.http.put<Aula>(`${API_URL}/aulas/${id}`, aula);
+  }
+
+  deletarAula(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/aulas/${id}`);
+  }
+
+  // Presenças
   getPresencasPorAula(aulaId: number): Observable<Matricula[]> {
     return this.http.get<Matricula[]>(`${API_URL}/matriculas/aula/${aulaId}`);
   }
 
-  registrarPresenca(aulaId: number, matriculaId: number): Observable<any> {
+  registrarPresenca(aulaId: number, matriculaId: number): Observable<Presenca> {
     const payload = {
       matriculaId: matriculaId,
       aulaId: aulaId
     };
-    return this.http.post<any>(`${API_URL}/presencas`, payload);
+    return this.http.post<Presenca>(`${API_URL}/presencas`, payload);
   }
 
-  removerPresenca(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/presencas/${id}`);
+  removerPresenca(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/presencas/${id}`);
   }
 
-  getAlunos(): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/alunos`);
+  // Alunos
+  getAlunos(): Observable<Aluno[]> {
+    return this.http.get<Aluno[]>(`${API_URL}/alunos`);
   }
 
-  getAlunoPorId(id: number): Observable<any> {
-    return this.http.get<any>(`${API_URL}/alunos/${id}`);
+  getAlunoPorId(id: number): Observable<Aluno> {
+    return this.http.get<Aluno>(`${API_URL}/alunos/${id}`);
   }
 
-  criarAluno(aluno: { nome: string }): Observable<any> {
-    return this.http.post<any>(`${API_URL}/alunos`, aluno);
+  criarAluno(aluno: { nome: string }): Observable<Aluno> {
+    return this.http.post<Aluno>(`${API_URL}/alunos`, aluno);
   }
 
-  atualizarAluno(id: number, aluno: { nome: string }): Observable<any> {
-    return this.http.put<any>(`${API_URL}/alunos/${id}`, aluno);
+  atualizarAluno(id: number, aluno: { nome: string }): Observable<Aluno> {
+    return this.http.put<Aluno>(`${API_URL}/alunos/${id}`, aluno);
   }
 
-  getMatriculas(alunoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/matriculas/aluno/${alunoId}`);
+  // Matrículas
+  getMatriculas(alunoId: number): Observable<Matricula[]> {
+    return this.http.get<Matricula[]>(`${API_URL}/matriculas/aluno/${alunoId}`);
   }
 
-  criarMatricula(matricula: any): Observable<any> {
-    return this.http.post<any>(`${API_URL}/matriculas`, matricula);
+  criarMatricula(matricula: CadastroMatriculaPayload): Observable<Matricula> {
+    return this.http.post<Matricula>(`${API_URL}/matriculas`, matricula);
   }
 
-  deletarMatricula(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/matriculas/${id}`);
+  atualizarMatricula(id: number, matricula: AtualizarMatriculaPayload): Observable<Matricula> {
+    return this.http.put<Matricula>(`${API_URL}/matriculas/${id}`, matricula);
   }
 
-  atualizarMatricula(id: number, matricula: any): Observable<any> {
-    return this.http.put<any>(`${API_URL}/matriculas/${id}`, matricula);
+  atualizarStatusMatricula(id: number, ativo: boolean): Observable<void> {
+    return this.http.put<void>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, { ativo });
   }
 
-  atualizarStatusMatricula(id: number, ativo: boolean): Observable<any> {
-    return this.http.put<any>(`${API_URL}/matriculas/${id}/status?ativo=${ativo}`, { ativo });
+  deletarMatricula(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/matriculas/${id}`);
   }
 
-  getPagamentos(alunoId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/pagamentos/aluno/${alunoId}`);
+  // Pagamentos
+  getPagamentos(alunoId: number): Observable<Pagamento[]> {
+    return this.http.get<Pagamento[]>(`${API_URL}/pagamentos/aluno/${alunoId}`);
   }
 
-  getTodosPagamentos(params?: { inicio?: string, fim?: string, alunoId?: number, cicloId?: number }): Observable<any[]> {
+  getTodosPagamentos(params?: { inicio?: string, fim?: string, alunoId?: number, cicloId?: number }): Observable<Pagamento[]> {
     let query = '';
     if (params) {
       const q: string[] = [];
@@ -95,65 +161,18 @@ export class GerenciadorAulasService {
       if (params.cicloId) q.push(`cicloId=${params.cicloId}`);
       if (q.length > 0) query = '?' + q.join('&');
     }
-    return this.http.get<any[]>(`${API_URL}/pagamentos${query}`);
+    return this.http.get<Pagamento[]>(`${API_URL}/pagamentos${query}`);
   }
 
-  criarPagamento(pagamento: any): Observable<any> {
-    return this.http.post<any>(`${API_URL}/pagamentos`, pagamento);
+  criarPagamento(pagamento: CadastroPagamentoPayload): Observable<Pagamento> {
+    return this.http.post<Pagamento>(`${API_URL}/pagamentos`, pagamento);
   }
 
-  atualizarPagamento(id: number, pagamento: any): Observable<any> {
-    return this.http.put<any>(`${API_URL}/pagamentos/${id}`, pagamento);
+  atualizarPagamento(id: number, pagamento: EditarPagamentoPayload): Observable<Pagamento> {
+    return this.http.put<Pagamento>(`${API_URL}/pagamentos/${id}`, pagamento);
   }
 
-  deletarPagamento(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/pagamentos/${id}`);
-  }
-
-  // Ciclos CRUD
-  criarCiclo(ciclo: any): Observable<any> {
-    return this.http.post<any>(`${API_URL}/ciclos`, ciclo);
-  }
-
-  atualizarCiclo(id: number, ciclo: any): Observable<any> {
-    return this.http.put<any>(`${API_URL}/ciclos/${id}`, ciclo);
-  }
-
-  deletarCiclo(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/ciclos/${id}`);
-  }
-
-  // Programas de Aulas CRUD
-  getTipoAulas(): Observable<any[]> {
-    return this.http.get<any[]>(`${API_URL}/tipo-aulas`);
-  }
-
-  criarProgramaAula(programa: any): Observable<any> {
-    return this.http.post<any>(`${API_URL}/programa-aulas`, programa);
-  }
-
-  atualizarProgramaAula(id: number, programa: any): Observable<any> {
-    return this.http.put<any>(`${API_URL}/programa-aulas/${id}`, programa);
-  }
-
-  deletarProgramaAula(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/programa-aulas/${id}`);
-  }
-
-  // Aulas CRUD
-  criarAula(aula: any): Observable<any> {
-    return this.http.post<any>(`${API_URL}/aulas`, aula);
-  }
-
-  atualizarAula(id: number, aula: any): Observable<any> {
-    return this.http.put<any>(`${API_URL}/aulas/${id}`, aula);
-  }
-
-  deletarAula(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_URL}/aulas/${id}`);
-  }
-
-  getAulaPorId(id: number): Observable<any> {
-    return this.http.get<any>(`${API_URL}/aulas/${id}`);
+  deletarPagamento(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/pagamentos/${id}`);
   }
 }

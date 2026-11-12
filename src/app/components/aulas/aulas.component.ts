@@ -80,12 +80,11 @@ export class AulasComponent implements OnInit {
     if (!this.programaId) return;
     this.service.getProgramaAulas().subscribe({
       next: (programas) => {
-        const prog = (programas || []).find((p: any) => p.id === this.programaId);
+        const prog = (programas || []).find(p => p.id === this.programaId);
         if (prog) {
           if (prog.nome) this.programaNome = prog.nome;
           if (prog.cicloId) this.cicloId = prog.cicloId;
-          if (prog.ciclo?.id) this.cicloId = prog.ciclo.id;
-          if (prog.ciclo?.nome) this.cicloNome = prog.ciclo.nome;
+          if (prog.cicloNome) this.cicloNome = prog.cicloNome;
           else if (this.cicloId && !this.cicloNome) {
             this.service.getCicloPorId(this.cicloId).subscribe(c => {
               if (c && c.nome) this.cicloNome = c.nome;
