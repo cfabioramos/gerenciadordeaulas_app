@@ -1,33 +1,29 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
-import {Subscription} from 'rxjs';
-import {EventosTabService} from '../../services/eventos-tab.service';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { EventosTabService } from '../../services/eventos-tab.service';
+import { GerenciadorAulasService } from '../../services/gerenciador-aulas.service';
+import { AuthService } from '../../services/auth.service';
+import { Aluno } from '../../models/aluno.model';
+import {
+  Evento,
+  EventoPayload,
+  ParticipanteEvento,
+  ReceitaEvento
+} from '../../models/evento.model';
 
-interface EventoItem {
-  id: number;
-  tipo: 'EVENTO' | 'VIAGEM';
-  titulo: string;
-  descricao: string;
-  local?: string;
-  status: string;
-  // Para Evento: array de datas com horários
-  datas?: Array<{ data: string; horario: string }>;
-  // Para Viagem: saída e retorno
-  dataSaida?: string;
-  horarioSaida?: string;
-  dataRetorno?: string;
-  horarioRetorno?: string;
-  participantes: Array<{ id: number; nome: string; tipo: 'ALUNO' | 'PARTICIPANTE' }>;
-  receitas: Array<{ id: number; descricao: string; valor: number; tipo: 'ALUNO' | 'PARTICIPANTE'; nomeReferencia: string }>;
-  despesas: Array<{ id: number; descricao: string; valor: number }>;
-  createdAt: string;
+/** Erro HTTP com o corpo padronizado do backend */
+interface HttpError {
+  error?: { message?: string; error?: string };
+  message?: string;
 }
 
-interface AlunoMock {
-  id: number;
-  nome: string;
+/** Linha do formulário de datas do Evento */
+interface DataEventoForm {
+  data: string;    // yyyy-MM-dd (input date)
+  horario: string; // HH:mm (input time)
 }
 
 @Component({
@@ -44,99 +40,23 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
   showModal = false;
   showParticipantesModal = false;
   showFinanceiroModal = false;
-  editingItem: EventoItem | null = null;
-  selectedItemForDetails: EventoItem | null = null;
+  editingItem: Evento | null = null;
+  selectedItemForDetails: Evento | null = null;
   searchTerm = '';
   modalLoading = false;
-  isAdmin = true;
+  loading = false;
+  erroCarregamento = '';
+  isAdmin = false;
   selectedAlunosTemp: number | null = null;
 
-  // Dados mockados - Alunos cadastrados
-  alunos: AlunoMock[] = [
-    { id: 1, nome: 'Carlos Fábio Ramos' },
-    { id: 2, nome: 'Marcos Afonso' },
-    { id: 3, nome: 'Ana Paula Silva' },
-    { id: 4, nome: 'Roberto Carlos Souza' },
-    { id: 5, nome: 'Fernanda Lima' }
-  ];
+  // Alunos cadastrados (API)
+  alunos: Aluno[] = [];
 
-  // Dados mockados - Participantes criados
-  participantesCriados: Array<{ id: number; nome: string }> = [
-    { id: 101, nome: 'João Participante' },
-    { id: 102, nome: 'Maria Visitante' }
-  ];
+  // Participantes criados no formulário (ainda não enviados ao backend)
+  participantesCriados: Array<{ id: number; nome: string }> = [];
 
-  // Dados mockados - Eventos e Viagens
-  itens: EventoItem[] = [
-    {
-      id: 1,
-      tipo: 'EVENTO',
-      titulo: 'Workshop de Forró 2026',
-      descricao: 'Oficina intensiva de passos básicos e intermediários de forró',
-      local: 'Salão de Dança Ziriguidum',
-      status: 'AGENDADO',
-      datas: [
-        { data: '10/09/2026', horario: '19:00' },
-        { data: '17/09/2026', horario: '19:00' },
-        { data: '24/09/2026', horario: '19:00' },
-        { data: '01/10/2026', horario: '19:00' }
-      ],
-      participantes: [
-        { id: 1, nome: 'Carlos Fábio Ramos', tipo: 'ALUNO' },
-        { id: 101, nome: 'João Participante', tipo: 'PARTICIPANTE' }
-      ],
-      receitas: [
-        { id: 1, descricao: 'Inscrição workshop', valor: 150.00, tipo: 'ALUNO', nomeReferencia: 'Carlos Fábio Ramos' },
-        { id: 2, descricao: 'Inscrição workshop', valor: 100.00, tipo: 'PARTICIPANTE', nomeReferencia: 'João Participante' }
-      ],
-      despesas: [
-        { id: 1, descricao: 'Aluguel do salão', valor: 200.00 },
-        { id: 2, descricao: 'Coffee break', valor: 80.00 }
-      ],
-      createdAt: '01/09/2026'
-    },
-    {
-      id: 2,
-      tipo: 'VIAGEM',
-      titulo: 'Viagem Cultural - Salvador',
-      descricao: 'Viagem de estudos sobre cultura popular baiana',
-      local: 'Salvador, BA',
-      status: 'CONFIRMADO',
-      dataSaida: '15/10/2026',
-      horarioSaida: '08:00',
-      dataRetorno: '20/10/2026',
-      horarioRetorno: '22:00',
-      participantes: [
-        { id: 2, nome: 'Marcos Afonso', tipo: 'ALUNO' },
-        { id: 3, nome: 'Ana Paula Silva', tipo: 'ALUNO' }
-      ],
-      receitas: [
-        { id: 3, descricao: 'Pacote viagem', valor: 1200.00, tipo: 'ALUNO', nomeReferencia: 'Marcos Afonso' },
-        { id: 4, descricao: 'Pacote viagem', valor: 1200.00, tipo: 'ALUNO', nomeReferencia: 'Ana Paula Silva' }
-      ],
-      despesas: [
-        { id: 3, descricao: 'Passagem aérea', valor: 800.00 },
-        { id: 4, descricao: 'Hospedagem', valor: 600.00 },
-        { id: 5, descricao: 'Transporte local', valor: 150.00 }
-      ],
-      createdAt: '20/08/2026'
-    },
-    {
-      id: 3,
-      tipo: 'EVENTO',
-      titulo: 'Encontro de Dança Circular',
-      descricao: 'Rodas de dança circular com músicas regionais',
-      local: 'Centro Cultural',
-      status: 'CANCELADO',
-      datas: [
-        { data: '05/10/2026', horario: '14:00' }
-      ],
-      participantes: [],
-      receitas: [],
-      despesas: [],
-      createdAt: '15/08/2026'
-    }
-  ];
+  // Eventos e viagens vindos da API
+  itens: Evento[] = [];
 
   // Estado do formulário de cadastro/edição
   formTipo: 'EVENTO' | 'VIAGEM' = 'EVENTO';
@@ -146,13 +66,11 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
   formStatus = 'AGENDADO';
 
   // Para Evento: array de datas/horários
-  formDatas: Array<{ data: string; horario: string }> = [];
+  formDatas: DataEventoForm[] = [];
 
-  // Para Viagem: saída e retorno
+  // Para Viagem: saída e retorno (datetime-local: yyyy-MM-ddTHH:mm)
   formDataSaida = '';
-  formHorarioSaida = '';
   formDataRetorno = '';
-  formHorarioRetorno = '';
 
   // Participantes selecionados
   selectedAlunos: number[] = [];
@@ -168,7 +86,9 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly eventosTab: EventosTabService
+    private readonly eventosTab: EventosTabService,
+    private readonly svc: GerenciadorAulasService,
+    private readonly auth: AuthService
   ) {}
 
   private tabSub: Subscription | null = null;
@@ -182,6 +102,10 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     // /eventos → aba Eventos | /viagens → aba Viagens
     const path = this.route.snapshot.url.map(seg => seg.path).join('/');
     this.tipo = path === 'viagens' ? 'VIAGEM' : 'EVENTO';
+
+    this.isAdmin = this.auth.isAdmin();
+    this.carregarAlunos();
+    this.carregarEventos();
   }
 
   ngOnDestroy(): void {
@@ -205,7 +129,7 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     return this.tipo === 'VIAGEM' ? 'Viagens' : 'Eventos';
   }
 
-  get itensFiltrados(): EventoItem[] {
+  get itensFiltrados(): Evento[] {
     const lista = this.itens.filter(i => i.tipo === this.tipo);
     if (!this.searchTerm) return lista;
     const term = this.searchTerm.toLowerCase();
@@ -221,16 +145,72 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
 
   get totalReceitas(): number {
     if (!this.selectedItemForDetails) return 0;
-    return this.selectedItemForDetails.receitas.reduce((acc, r) => acc + r.valor, 0);
+    return (this.selectedItemForDetails.receitas || []).reduce((acc, r) => acc + r.valor, 0);
   }
 
   get totalDespesas(): number {
     if (!this.selectedItemForDetails) return 0;
-    return this.selectedItemForDetails.despesas.reduce((acc, d) => acc + d.valor, 0);
+    return (this.selectedItemForDetails.despesas || []).reduce((acc, d) => acc + d.valor, 0);
   }
 
   get saldo(): number {
     return this.totalReceitas - this.totalDespesas;
+  }
+
+  /** Participantes do evento selecionado que não são alunos cadastrados */
+  get participantesNaoAlunos(): ParticipanteEvento[] {
+    return (this.selectedItemForDetails?.participantes || [])
+      .filter(p => !this.ehAlunoNome(p.nome));
+  }
+
+  // --- Carga de dados ---
+
+  private carregarAlunos(): void {
+    this.svc.getAlunos().subscribe({
+      next: alunos => this.alunos = alunos,
+      error: () => this.erroCarregamento = 'Erro ao carregar alunos.'
+    });
+  }
+
+  carregarEventos(): void {
+    this.loading = true;
+    this.erroCarregamento = '';
+    this.svc.getEventos().subscribe({
+      next: eventos => {
+        this.itens = eventos.map(e => this.preparar(e));
+        this.loading = false;
+        this.sincronizarSelecionados();
+      },
+      error: () => {
+        this.loading = false;
+        this.erroCarregamento = 'Erro ao carregar eventos e viagens.';
+      }
+    });
+  }
+
+  /** Normaliza coleções vindas da API (o backend usa Set, sem ordem garantida) */
+  private preparar(e: Evento): Evento {
+    e.dias = (e.dias || []).sort((a, b) => (a.dataEvento || '').localeCompare(b.dataEvento || ''));
+    e.participantes = (e.participantes || []).sort((a, b) => a.nome.localeCompare(b.nome));
+    e.receitas = (e.receitas || []).sort((a, b) => a.id - b.id);
+    e.despesas = (e.despesas || []).sort((a, b) => a.id - b.id);
+    return e;
+  }
+
+  /** Reaponta os itens selecionados nos modais para as versões recarregadas */
+  private sincronizarSelecionados(): void {
+    if (this.selectedItemForDetails) {
+      const id = this.selectedItemForDetails.id;
+      this.selectedItemForDetails = this.itens.find(i => i.id === id) ?? null;
+      if (!this.selectedItemForDetails) {
+        this.showParticipantesModal = false;
+        this.showFinanceiroModal = false;
+      }
+    }
+    if (this.editingItem) {
+      const id = this.editingItem.id;
+      this.editingItem = this.itens.find(i => i.id === id) ?? null;
+    }
   }
 
   // --- Navegação de tipo ---
@@ -246,32 +226,44 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  editarItem(item: EventoItem): void {
+  editarItem(item: Evento): void {
     this.editingItem = item;
     this.formTipo = item.tipo;
     this.formTitulo = item.titulo;
     this.formDescricao = item.descricao || '';
     this.formLocal = item.local || '';
     this.formStatus = item.status;
-    this.selectedAlunos = item.participantes.filter(p => p.tipo === 'ALUNO').map(p => p.id);
-    this.selectedParticipantes = item.participantes.filter(p => p.tipo === 'PARTICIPANTE').map(p => p.id);
 
-    if (item.tipo === 'EVENTO' && item.datas) {
-      this.formDatas = [...item.datas];
-    } else if (item.tipo === 'VIAGEM') {
-      this.formDataSaida = item.dataSaida || '';
-      this.formHorarioSaida = item.horarioSaida || '';
-      this.formDataRetorno = item.dataRetorno || '';
-      this.formHorarioRetorno = item.horarioRetorno || '';
+    // Separa os participantes entre alunos já cadastrados e demais
+    this.selectedAlunos = [];
+    this.participantesCriados = [];
+    this.selectedParticipantes = [];
+    for (const p of (item.participantes || [])) {
+      const aluno = this.alunos.find(a => this.mesmoNome(a.nome, p.nome));
+      if (aluno) {
+        this.selectedAlunos.push(aluno.id);
+      } else {
+        this.participantesCriados.push({ id: p.id, nome: p.nome });
+        this.selectedParticipantes.push(p.id);
+      }
+    }
+
+    if (item.tipo === 'EVENTO') {
+      this.formDatas = (item.dias || []).map(d => ({ data: d.dataEvento, horario: d.horario }));
+    } else {
+      this.formDataSaida = (item.dataInicio || '').substring(0, 16);
+      this.formDataRetorno = (item.dataFim || '').substring(0, 16);
     }
 
     this.showModal = true;
   }
 
-  excluirItem(item: EventoItem): void {
-    if (confirm(`Tem certeza que deseja excluir "${item.titulo}"?`)) {
-      this.itens = this.itens.filter(i => i.id !== item.id);
-    }
+  excluirItem(item: Evento): void {
+    if (!confirm(`Tem certeza que deseja excluir "${item.titulo}"?`)) return;
+    this.svc.deletarEvento(item.id).subscribe({
+      next: () => this.carregarEventos(),
+      error: (err: HttpError) => alert('Erro ao excluir: ' + this.mensagemErro(err))
+    });
   }
 
   limparFormulario(): void {
@@ -281,11 +273,10 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     this.formStatus = 'AGENDADO';
     this.formDatas = [];
     this.formDataSaida = '';
-    this.formHorarioSaida = '';
     this.formDataRetorno = '';
-    this.formHorarioRetorno = '';
     this.selectedAlunos = [];
     this.selectedParticipantes = [];
+    this.participantesCriados = [];
     this.novoParticipanteNome = '';
   }
 
@@ -297,7 +288,7 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     this.formDatas.splice(index, 1);
   }
 
-  // --- Salvar formulário ---
+  // --- Salvar formulário (criar/editar via API) ---
   onSubmit(): void {
     if (!this.formTitulo || !this.formDescricao) {
       alert('Título e Descrição são obrigatórios.');
@@ -309,7 +300,6 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
         alert('Informe pelo menos uma data e horário para o Evento.');
         return;
       }
-      // Validar datas/horários preenchidos
       for (const d of this.formDatas) {
         if (!d.data || !d.horario) {
           alert('Preencha todas as datas e horários do Evento.');
@@ -317,66 +307,166 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
         }
       }
     } else {
-      if (!this.formDataSaida || !this.formHorarioSaida || !this.formDataRetorno || !this.formHorarioRetorno) {
+      if (!this.formDataSaida || !this.formDataRetorno) {
         alert('Data/Hora de saída e retorno são obrigatórios para Viagem.');
         return;
       }
     }
 
-    const novoItem: EventoItem = {
-      id: this.editingItem ? this.editingItem.id : Date.now(),
+    const payload = this.montarPayload();
+    this.modalLoading = true;
+
+    const requisicao = this.editingItem
+      ? this.svc.atualizarEvento(this.editingItem.id, payload)
+      : this.svc.criarEvento(payload);
+
+    requisicao.subscribe({
+      next: () => {
+        this.modalLoading = false;
+        this.showModal = false;
+        this.editingItem = null;
+        this.limparFormulario();
+        this.carregarEventos();
+      },
+      error: (err: HttpError) => {
+        this.modalLoading = false;
+        alert('Erro ao salvar: ' + this.mensagemErro(err));
+      }
+    });
+  }
+
+  /** Monta o payload conforme o contrato do backend (/api/eventos) */
+  private montarPayload(): EventoPayload {
+    const nomesVistos = new Set<string>();
+    const participantes: Array<{ nome: string }> = [];
+    const adicionar = (nome: string): void => {
+      const chave = nome.trim().toLowerCase();
+      if (!chave || nomesVistos.has(chave)) return;
+      nomesVistos.add(chave);
+      participantes.push({ nome: nome.trim() });
+    };
+    this.selectedAlunos
+      .map(id => this.alunos.find(a => a.id === id))
+      .filter((a): a is Aluno => !!a)
+      .forEach(a => adicionar(a.nome));
+    this.participantesCriados
+      .filter(p => this.selectedParticipantes.includes(p.id))
+      .forEach(p => adicionar(p.nome));
+
+    const base = {
+      titulo: this.formTitulo.trim(),
+      descricao: this.formDescricao.trim(),
       tipo: this.formTipo,
-      titulo: this.formTitulo,
-      descricao: this.formDescricao,
-      local: this.formLocal,
+      local: this.formLocal.trim() || null,
       status: this.formStatus,
-      participantes: [
-        ...this.selectedAlunos.map(id => ({ id, nome: this.alunos.find(a => a.id === id)!.nome, tipo: 'ALUNO' as const })),
-        ...this.selectedParticipantes.map(id => ({ id, nome: this.participantesCriados.find(p => p.id === id)!.nome, tipo: 'PARTICIPANTE' as const }))
-      ],
-      receitas: this.editingItem ? [...this.editingItem.receitas] : [],
-      despesas: this.editingItem ? [...this.editingItem.despesas] : [],
-      createdAt: new Date().toLocaleDateString('pt-BR')
+      participantes
     };
 
     if (this.formTipo === 'EVENTO') {
-      novoItem.datas = [...this.formDatas];
-    } else {
-      novoItem.dataSaida = this.formDataSaida;
-      novoItem.horarioSaida = this.formHorarioSaida;
-      novoItem.dataRetorno = this.formDataRetorno;
-      novoItem.horarioRetorno = this.formHorarioRetorno;
+      const datas = [...this.formDatas].sort((a, b) => a.data.localeCompare(b.data));
+      return {
+        ...base,
+        dias: datas.map(d => ({ dataEvento: d.data, horario: d.horario })),
+        dataInicio: `${datas[0].data}T${datas[0].horario}:00`,
+        dataFim: `${datas[datas.length - 1].data}T${datas[datas.length - 1].horario}:00`,
+        horarioInicio: datas[0].horario,
+        horarioFim: datas[datas.length - 1].horario
+      };
     }
 
-    if (this.editingItem) {
-      const idx = this.itens.findIndex(i => i.id === this.editingItem!.id);
-      if (idx >= 0) this.itens[idx] = novoItem;
-    } else {
-      this.itens.push(novoItem);
-    }
-
-    this.showModal = false;
-    this.editingItem = null;
-    this.limparFormulario();
+    return {
+      ...base,
+      dias: [],
+      dataInicio: this.comSegundos(this.formDataSaida),
+      dataFim: this.comSegundos(this.formDataRetorno),
+      horarioInicio: this.formDataSaida.substring(11, 16),
+      horarioFim: this.formDataRetorno.substring(11, 16)
+    };
   }
 
-  // --- Participantes Modal ---
-  abrirParticipantes(item: EventoItem): void {
+  private comSegundos(valor: string): string {
+    return valor.length === 16 ? `${valor}:00` : valor;
+  }
+
+  // --- Participantes Modal (operações imediatas na API) ---
+  abrirParticipantes(item: Evento): void {
     this.selectedItemForDetails = item;
-    this.selectedAlunos = item.participantes.filter(p => p.tipo === 'ALUNO').map(p => p.id);
-    this.selectedParticipantes = item.participantes.filter(p => p.tipo === 'PARTICIPANTE').map(p => p.id);
     this.novoParticipanteNome = '';
+    this.selectedAlunosTemp = null;
     this.showParticipantesModal = true;
   }
 
-  adicionarParticipante(): void {
-    if (!this.novoParticipanteNome.trim()) {
+  adicionarAlunoTemp(): void {
+    if (!this.selectedAlunosTemp) return;
+    const aluno = this.alunos.find(a => a.id === this.selectedAlunosTemp);
+    this.selectedAlunosTemp = null;
+    if (aluno) this.adicionarParticipanteApi(aluno.nome);
+  }
+
+  adicionarParticipanteNovoTemp(): void {
+    const nome = this.novoParticipanteNome.trim();
+    if (!nome) {
       alert('Informe o nome do participante.');
       return;
     }
-    const novo = { id: Date.now(), nome: this.novoParticipanteNome.trim() };
+    this.novoParticipanteNome = '';
+    this.adicionarParticipanteApi(nome);
+  }
+
+  private adicionarParticipanteApi(nome: string): void {
+    const item = this.selectedItemForDetails;
+    if (!item) return;
+    if ((item.participantes || []).some(p => this.mesmoNome(p.nome, nome))) {
+      alert('Este participante já está associado ao evento.');
+      return;
+    }
+    this.modalLoading = true;
+    this.svc.criarParticipante({ nome, evento: { id: item.id } }).subscribe({
+      next: () => {
+        this.modalLoading = false;
+        this.carregarEventos();
+      },
+      error: (err: HttpError) => {
+        this.modalLoading = false;
+        alert('Erro ao adicionar participante: ' + this.mensagemErro(err));
+      }
+    });
+  }
+
+  removerParticipanteApi(p: ParticipanteEvento): void {
+    if (!this.selectedItemForDetails) return;
+    if (!confirm(`Remover o participante "${p.nome}" deste evento?`)) return;
+    this.modalLoading = true;
+    this.svc.deletarParticipante(p.id).subscribe({
+      next: () => {
+        this.modalLoading = false;
+        this.carregarEventos();
+      },
+      error: (err: HttpError) => {
+        this.modalLoading = false;
+        alert('Erro ao remover participante: ' + this.mensagemErro(err));
+      }
+    });
+  }
+
+  // --- Participantes no formulário (seleção local, enviada no save) ---
+  adicionarParticipante(): void {
+    const nome = this.novoParticipanteNome.trim();
+    if (!nome) {
+      alert('Informe o nome do participante.');
+      return;
+    }
+    const jaExiste = this.participantesCriados.some(p => this.mesmoNome(p.nome, nome)) ||
+      this.selectedAlunos.some(id => this.mesmoNome(this.getNomeAluno(id), nome));
+    if (jaExiste) {
+      alert('Este participante já foi adicionado.');
+      return;
+    }
+    const novo = { id: Date.now(), nome };
     this.participantesCriados.push(novo);
-    this.selectedParticipantes.push(novo.id);
+    if (!this.selectedParticipantes.includes(novo.id)) {
+      this.selectedParticipantes.push(novo.id);
+    }
     this.novoParticipanteNome = '';
   }
 
@@ -388,81 +478,155 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     }
   }
 
-  salvarParticipantes(): void {
-    if (!this.selectedItemForDetails) return;
-    this.selectedItemForDetails.participantes = [
-      ...this.selectedAlunos.map(id => ({id, nome: this.alunos.find(a => a.id === id)!.nome, tipo: 'ALUNO' as const})),
-      ...this.selectedParticipantes.map(id => ({
-        id,
-        nome: this.participantesCriados.find(p => p.id === id)!.nome,
-        tipo: 'PARTICIPANTE' as const
-      }))
-    ];
-    this.showParticipantesModal = false;
-    this.selectedItemForDetails = null;
-  }
-
-  abrirDetalhesFinanceiros(item: EventoItem): void {
-    this.abrirFinanceiro(item, 'RECEITA');
+  toggleParticipante(id: number): void {
+    if (this.selectedParticipantes.includes(id)) {
+      this.selectedParticipantes = this.selectedParticipantes.filter(x => x !== id);
+    } else {
+      this.selectedParticipantes.push(id);
+    }
   }
 
   // --- Financeiro Modal ---
-  abrirFinanceiro(item: EventoItem, modalTipo: 'RECEITA' | 'DESPESA'): void {
+  abrirDetalhesFinanceiros(item: Evento): void {
+    this.abrirFinanceiro(item, 'RECEITA');
+  }
+
+  abrirFinanceiro(item: Evento, modalTipo: 'RECEITA' | 'DESPESA'): void {
     this.selectedItemForDetails = item;
     this.modalTipo = modalTipo;
     this.formDescricaoFinanceiro = '';
     this.formValorFinanceiro = 0;
     this.formTipoReferencia = 'ALUNO';
-    this.formReferenciaId = null;
+    this.formReferenciaId = this.alunos[0]?.id ?? null;
     this.showFinanceiroModal = true;
   }
 
+  alternarTipoReferencia(tipo: 'ALUNO' | 'PARTICIPANTE'): void {
+    this.formTipoReferencia = tipo;
+    this.formReferenciaId = tipo === 'ALUNO'
+      ? (this.alunos[0]?.id ?? null)
+      : (this.participantesNaoAlunos[0]?.id ?? null);
+  }
+
   salvarFinanceiro(): void {
-    if (!this.selectedItemForDetails) return;
+    const item = this.selectedItemForDetails;
+    if (!item) return;
     if (!this.formDescricaoFinanceiro || this.formValorFinanceiro <= 0) {
       alert('Descrição e valor são obrigatórios.');
       return;
     }
 
-    const novoId = Date.now();
-    if (this.modalTipo === 'RECEITA') {
-      const ref = this.formTipoReferencia === 'ALUNO'
-        ? this.alunos.find(a => a.id === this.formReferenciaId)!
-        : this.participantesCriados.find(p => p.id === this.formReferenciaId)!;
-      this.selectedItemForDetails.receitas.push({
-        id: novoId,
+    if (this.modalTipo === 'DESPESA') {
+      this.modalLoading = true;
+      this.svc.criarDespesa({
         descricao: this.formDescricaoFinanceiro,
         valor: this.formValorFinanceiro,
-        tipo: this.formTipoReferencia,
-        nomeReferencia: ref.nome
+        evento: { id: item.id }
+      }).subscribe({
+        next: () => this.aposLancamentoFinanceiro(),
+        error: (err: HttpError) => this.erroLancamento(err)
       });
-    } else {
-      this.selectedItemForDetails.despesas.push({
-        id: novoId,
-        descricao: this.formDescricaoFinanceiro,
-        valor: this.formValorFinanceiro
-      });
+      return;
     }
 
-    this.showFinanceiroModal = false;
-    this.selectedItemForDetails = null;
+    // RECEITA: a referência é gravada em receita.participante_id
+    if (this.formReferenciaId == null) {
+      alert('Selecione a referência (aluno ou participante).');
+      return;
+    }
+
+    this.modalLoading = true;
+
+    if (this.formTipoReferencia === 'PARTICIPANTE') {
+      const participante = (item.participantes || []).find(p => p.id === this.formReferenciaId);
+      if (!participante) {
+        this.modalLoading = false;
+        alert('Participante não encontrado. Atualize a lista e tente novamente.');
+        return;
+      }
+      this.criarReceitaCom(item, participante.id);
+      return;
+    }
+
+    const aluno = this.alunos.find(a => a.id === this.formReferenciaId);
+    if (!aluno) {
+      this.modalLoading = false;
+      alert('Aluno não encontrado.');
+      return;
+    }
+    const existente = (item.participantes || []).find(p => this.mesmoNome(p.nome, aluno.nome));
+    if (existente) {
+      this.criarReceitaCom(item, existente.id);
+      return;
+    }
+    // Aluno ainda não é participante do evento: cria o vínculo antes da receita
+    this.svc.criarParticipante({ nome: aluno.nome, evento: { id: item.id } }).subscribe({
+      next: novo => this.criarReceitaCom(item, novo.id),
+      error: (err: HttpError) => this.erroLancamento(err)
+    });
+  }
+
+  private criarReceitaCom(item: Evento, participanteId: number): void {
+    this.svc.criarReceita({
+      descricao: this.formDescricaoFinanceiro,
+      valor: this.formValorFinanceiro,
+      evento: { id: item.id },
+      participante: { id: participanteId }
+    }).subscribe({
+      next: () => this.aposLancamentoFinanceiro(),
+      error: (err: HttpError) => this.erroLancamento(err)
+    });
+  }
+
+  private aposLancamentoFinanceiro(): void {
+    this.modalLoading = false;
+    this.formDescricaoFinanceiro = '';
+    this.formValorFinanceiro = 0;
+    this.formReferenciaId = this.formTipoReferencia === 'ALUNO'
+      ? (this.alunos[0]?.id ?? null)
+      : (this.participantesNaoAlunos[0]?.id ?? null);
+    this.carregarEventos();
+  }
+
+  private erroLancamento(err: HttpError): void {
+    this.modalLoading = false;
+    alert('Erro ao salvar: ' + this.mensagemErro(err));
   }
 
   removerReceita(id: number): void {
-    if (!this.selectedItemForDetails) return;
-    this.selectedItemForDetails.receitas = this.selectedItemForDetails.receitas.filter(r => r.id !== id);
+    this.modalLoading = true;
+    this.svc.deletarReceita(id).subscribe({
+      next: () => {
+        this.modalLoading = false;
+        this.carregarEventos();
+      },
+      error: (err: HttpError) => {
+        this.modalLoading = false;
+        alert('Erro ao remover receita: ' + this.mensagemErro(err));
+      }
+    });
   }
 
   removerDespesa(id: number): void {
-    if (!this.selectedItemForDetails) return;
-    this.selectedItemForDetails.despesas = this.selectedItemForDetails.despesas.filter(d => d.id !== id);
+    this.modalLoading = true;
+    this.svc.deletarDespesa(id).subscribe({
+      next: () => {
+        this.modalLoading = false;
+        this.carregarEventos();
+      },
+      error: (err: HttpError) => {
+        this.modalLoading = false;
+        alert('Erro ao remover despesa: ' + this.mensagemErro(err));
+      }
+    });
   }
 
   // --- Helpers de template ---
   formatarDataBR(dataStr: string | undefined): string {
     if (!dataStr) return '';
-    if (dataStr.includes('/')) return dataStr;
-    const parts = dataStr.split('-');
+    const somenteData = dataStr.split('T')[0];
+    if (somenteData.includes('/')) return somenteData;
+    const parts = somenteData.split('-');
     if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
     return dataStr;
   }
@@ -476,8 +640,17 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
 
-  getDescricaoReferencia(tipo: 'ALUNO' | 'PARTICIPANTE', nome: string): string {
-    return `${tipo === 'ALUNO' ? 'Aluno' : 'Participante'}: ${nome}`;
+  /** Classifica a referência da receita: Aluno (nome confere) ou Participante */
+  getDescricaoReferenciaReceita(r: ReceitaEvento): string {
+    const nome = r.participante?.nome;
+    if (!nome) return '—';
+    return `${this.ehAlunoNome(nome) ? 'Aluno' : 'Participante'}: ${nome}`;
+  }
+
+  /** true quando o nome corresponde a um aluno cadastrado */
+  ehAlunoNome(nome: string | undefined): boolean {
+    if (!nome) return false;
+    return this.alunos.some(a => this.mesmoNome(a.nome, nome));
   }
 
   getNomeAluno(id: number): string {
@@ -490,27 +663,12 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     return p ? p.nome : '';
   }
 
-  toggleParticipante(id: number): void {
-    if (this.selectedParticipantes.includes(id)) {
-      this.selectedParticipantes = this.selectedParticipantes.filter(x => x !== id);
-    } else {
-      this.selectedParticipantes.push(id);
-    }
+  private mesmoNome(a: string | undefined, b: string | undefined): boolean {
+    if (!a || !b) return false;
+    return a.trim().toLowerCase() === b.trim().toLowerCase();
   }
 
-  adicionarAlunoTemp(): void {
-    if (!this.selectedAlunosTemp) return;
-    if (!this.selectedAlunos.includes(this.selectedAlunosTemp)) {
-      this.selectedAlunos.push(this.selectedAlunosTemp);
-    }
-    this.selectedAlunosTemp = null;
-  }
-
-  adicionarParticipanteNovoTemp(): void {
-    if (!this.novoParticipanteNome.trim()) return;
-    const novo = { id: Date.now(), nome: this.novoParticipanteNome.trim() };
-    this.participantesCriados.push(novo);
-    this.selectedParticipantes.push(novo.id);
-    this.novoParticipanteNome = '';
+  private mensagemErro(err: HttpError): string {
+    return err?.error?.message || err?.error?.error || err?.message || 'Tente novamente.';
   }
 }

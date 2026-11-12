@@ -18,6 +18,16 @@ import {
 import { Presenca } from '../models/presenca.model';
 import { ProgramaAula, ProgramaAulaPayload } from '../models/programa-aula.model';
 import { TipoAula } from '../models/tipo-aula.model';
+import {
+  Evento,
+  EventoPayload,
+  ParticipanteEvento,
+  ParticipantePayload,
+  ReceitaEvento,
+  ReceitaPayload,
+  DespesaEvento,
+  DespesaPayload
+} from '../models/evento.model';
 
 export { API_URL };
 
@@ -174,5 +184,46 @@ export class GerenciadorAulasService {
 
   deletarPagamento(id: number): Observable<void> {
     return this.http.delete<void>(`${API_URL}/pagamentos/${id}`);
+  }
+
+  // Eventos e Viagens
+  getEventos(): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${API_URL}/api/eventos`);
+  }
+
+  criarEvento(evento: EventoPayload): Observable<Evento> {
+    return this.http.post<Evento>(`${API_URL}/api/eventos`, evento);
+  }
+
+  atualizarEvento(id: number, evento: EventoPayload): Observable<Evento> {
+    return this.http.put<Evento>(`${API_URL}/api/eventos/${id}`, evento);
+  }
+
+  deletarEvento(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/eventos/${id}`);
+  }
+
+  criarParticipante(participante: ParticipantePayload): Observable<ParticipanteEvento> {
+    return this.http.post<ParticipanteEvento>(`${API_URL}/api/participantes`, participante);
+  }
+
+  deletarParticipante(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/participantes/${id}`);
+  }
+
+  criarReceita(receita: ReceitaPayload): Observable<ReceitaEvento> {
+    return this.http.post<ReceitaEvento>(`${API_URL}/api/receitas`, receita);
+  }
+
+  deletarReceita(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/receitas/${id}`);
+  }
+
+  criarDespesa(despesa: DespesaPayload): Observable<DespesaEvento> {
+    return this.http.post<DespesaEvento>(`${API_URL}/api/despesas`, despesa);
+  }
+
+  deletarDespesa(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_URL}/api/despesas/${id}`);
   }
 }

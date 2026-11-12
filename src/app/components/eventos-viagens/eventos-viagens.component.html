@@ -58,13 +58,14 @@
           </td>
           <td>
             <ng-container *ngIf="item.tipo === 'EVENTO'; else viagemTemplate">
-              <div *ngFor="let d of item.datas">
-                {{ formatarDataBR(d.data) }} às {{ d.horario }}
+              <div *ngFor="let d of item.dias">
+                {{ formatarDataBR(d.dataEvento) }} às {{ d.horario }}
               </div>
+              <div *ngIf="!item.dias?.length">—</div>
             </ng-container>
             <ng-template #viagemTemplate>
-              <div>Saída: {{ formatarDataBR(item.dataSaida) }} às {{ item.horarioSaida }}</div>
-              <div>Retorno: {{ formatarDataBR(item.dataRetorno) }} às {{ item.horarioRetorno }}</div>
+              <div>Saída: {{ formatarDataBR(item.dataInicio) }} às {{ item.horarioInicio }}</div>
+              <div>Retorno: {{ formatarDataBR(item.dataFim) }} às {{ item.horarioFim }}</div>
             </ng-template>
           </td>
           <td>
@@ -72,7 +73,7 @@
               <span *ngFor="let p of item.participantes" class="participante-chip">
                 {{ p.nome }}
               </span>
-              <span *ngIf="item.participantes.length === 0" class="participante-vazio">—</span>
+              <span *ngIf="!item.participantes?.length" class="participante-vazio">—</span>
             </div>
           </td>
           <td *ngIf="isAdmin">
@@ -84,8 +85,18 @@
             </div>
           </td>
         </tr>
-        <tr *ngIf="itensFiltrados.length === 0">
-          <td [attr.colspan]="isAdmin ? 6 : 5" style="text-align: center;">
+        <tr *ngIf="loading">
+          <td [attr.colspan]="isAdmin ? 5 : 4" style="text-align: center;">
+            Carregando...
+          </td>
+        </tr>
+        <tr *ngIf="!loading && erroCarregamento">
+          <td [attr.colspan]="isAdmin ? 5 : 4" style="text-align: center;">
+            {{ erroCarregamento }}
+          </td>
+        </tr>
+        <tr *ngIf="!loading && !erroCarregamento && itensFiltrados.length === 0">
+          <td [attr.colspan]="isAdmin ? 5 : 4" style="text-align: center;">
             Nenhum {{ tipoLabel.toLowerCase() }} encontrado.
           </td>
         </tr>
@@ -357,7 +368,7 @@
           >
             <div class="info">
               <strong>{{ r.descricao }}</strong>
-              <span class="ref">{{ getDescricaoReferencia(r.tipo, r.nomeReferencia) }}</span>
+              <span class="ref">{{ getDescricaoReferenciaReceita(r) }}</span>
             </div>
             <span class="valor">{{ formatarMoeda(r.valor) }}</span>
             <button class="btn-remover" (click)="removerReceita(r.id)" title="Remover">×</button>
@@ -413,11 +424,21 @@
             <label>Referência <span class="required" aria-hidden="true">*</span></label>
             <div class="ref-selector">
               <label class="radio-label">
-                <input type="radio" [(ngModel)]="formTipoReferencia" name="tipoRef" value="ALUNO" />
+                <input
+                  type="radio"
+                  name="tipoRef"
+                  [checked]="formTipoReferencia === 'ALUNO'"
+                  (change)="alternarTipoReferencia('ALUNO')"
+                />
                 Aluno
               </label>
               <label class="radio-label">
-                <input type="radio" [(ngModel)]="formTipoReferencia" name="tipoRef" value="PARTICIPANTE" />
+                <input
+                  type="radio"
+                  name="tipoRef"
+                  [checked]="formTipoReferencia === 'PARTICIPANTE'"
+                  (change)="alternarTipoReferencia('PARTICIPANTE')"
+                />
                 Participante
               </label>
             </div>
@@ -426,12 +447,16 @@
               [(ngModel)]="formReferenciaId"
               name="referenciaId"
             >
-              <option *ngFor="let a of alunos" [value]="a.id">
-                Aluno: {{ a.nome }}
-              </option>
-              <option *ngFor="let p of participantesCriados" [value]="p.id">
-                Participante: {{ p.nome }}
-              </option>
+              <ng-container *ngIf="formTipoReferencia === 'ALUNO'; else participantesRef">
+                <option *ngFor="let a of alunos" [value]="a.id">
+                  Aluno: {{ a.nome }}
+                </option>
+              </ng-container>
+              <ng-template #participantesRef>
+                <option *ngFor="let p of participantesNaoAlunos" [value]="p.id">
+                  Participante: {{ p.nome }}
+                </option>
+              </ng-template>
             </select>
           </div>
 
@@ -460,9 +485,9 @@
     <div class="modal-body">
       <div class="participantes-lista">
         <div class="participante-item" *ngFor="let p of (selectedItemForDetails?.participantes || [])">
-          <span class="tipo-badge">{{ p.tipo === 'ALUNO' ? 'Aluno' : 'Participante' }}</span>
+          <span class="tipo-badge">{{ ehAlunoNome(p.nome) ? 'Aluno' : 'Participante' }}</span>
           <span class="nome">{{ p.nome }}</span>
-          <button class="btn-remover" (click)="removerParticipanteSelecionado(p.id, p.tipo)" title="Remover">×</button>
+          <button class="btn-remover" (click)="removerParticipanteApi(p)" title="Remover">×</button>
         </div>
         <div *ngIf="!(selectedItemForDetails?.participantes?.length)" class="vazio">Nenhum participante associado.</div>
       </div>
@@ -505,10 +530,7 @@
 
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="showParticipantesModal = false">
-        Cancelar
-      </button>
-      <button type="button" class="btn btn-primary" (click)="salvarParticipantes()">
-        Salvar Participantes
+        Fechar
       </button>
     </div>
   </div>
