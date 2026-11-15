@@ -837,3 +837,12 @@
     height: 20px;
   }
 }
+
+/* Hide sidebar when a modal (Angular Material) is open */
+body.cdk-global-scrollblock .app-sidebar {
+  display: none !important;
+}
+/* Ensure header stays on top of modals */
+.app-header {
+  z-index: 30;
+}
