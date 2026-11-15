@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress"],
+  "testRunner": "karma",
+  "karma": {
+    "configFile": "karma.conf.js",
+    "projectType": "angular-cli"
+  },
+  "coverageAnalysis": "perTest",
+  "mutate": [
+    "src/**/*.ts",
+    "!src/**/*.spec.ts",
+    "!src/testing/**",
+    "!src/environments/**",
+    "!src/main.ts"
+  ],
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.app.json"
+}

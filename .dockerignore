@@ -1,0 +1,17 @@
+node_modules
+dist
+.angular
+.git
+.github
+.idea
+.vscode
+coverage
+scripts
+stryker.conf.json
+karma.conf.js
+.eslintrc.json
+.eslintignore
+.editorconfig
+README.md
+*.md
+npm-debug.log
