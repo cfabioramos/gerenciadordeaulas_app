@@ -19,12 +19,28 @@
 }
 
 .header-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   width: 100%;
   padding: 0 24px;
+  overflow: hidden;
+}
+
+.brand-copy {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-info {
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-brand {
@@ -346,7 +362,7 @@
   overflow: hidden;
   font-size: 0.94rem;
   font-weight: 500;
-  opacity: 0;
+  opacity: 1;
   transform: translateX(-8px);
   pointer-events: none;
   transition:
@@ -470,7 +486,6 @@
     font-size: 1rem;
   }
   .user-info {
-    flex: 1;
     width: auto;
     justify-content: flex-end;
     gap: 8px;
@@ -613,7 +628,7 @@
 
 @media (max-width: 620px) {
   .brand-copy {
-    display: none;
+    font-size: 9px;
   }
 
   .brand-mark {
@@ -861,49 +876,19 @@ body.cdk-global-scrollblock .app-sidebar {
 }
 /* Mobile fix: ensure header title stays visible */
 @media (max-width: 600px) {
+  /* Stack header items vertically on very small screens */
   .header-content {
-    grid-template-columns: auto 1fr;
+    flex-direction: row;
     align-items: center;
     gap: 8px;
+    padding: 8px 16px;
   }
   .brand-copy {
     flex-direction: column;
     align-items: flex-start;
   }
-  .brand-title {
-    font-size: 1rem; /* reduce size to fit */
-    white-space: normal;
-    overflow: visible;
-  }
-  .brand-title-prefix {
-    display: none; /* optional: hide prefix to save space */
-  }
-}
-/* Mobile fix for Samsung S25 (≈360 px) */
-@media (max-width: 480px) {
-  /* Reduce header grid to give title more space */
-  .header-content {
-    grid-template-columns: auto 1fr; /* logo + title */
-    gap: 8px;
-  }
-  /* Hide user info (name + logout) to free width */
-  .header-content .user-info {
-    display: none;
-  }
-  /* Allow title to wrap and be visible */
-  .app-header .brand-title {
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: unset;
-    font-size: 0.9rem !important;
-  }
-  /* Optional: hide the "Meu" prefix */
-  .app-header .brand-title-prefix {
-    display: none !important;
-  }
-  /* Align brand copy vertically */
-  .app-header .brand-copy {
-    flex-direction: column;
-    align-items: flex-start;
+  .app-header {
+    height: auto;
+    padding: 8px 0;
   }
 }
