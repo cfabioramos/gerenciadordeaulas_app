@@ -484,6 +484,7 @@
   }
   .brand-title {
     font-size: 1rem;
+    display: none;
   }
   .user-info {
     width: auto;
