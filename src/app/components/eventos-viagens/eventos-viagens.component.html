@@ -449,12 +449,12 @@
             >
               <ng-container *ngIf="formTipoReferencia === 'ALUNO'; else participantesRef">
                 <option *ngFor="let a of alunos" [value]="a.id">
-                  Aluno: {{ a.nome }}
+                  {{ a.nome }}
                 </option>
               </ng-container>
               <ng-template #participantesRef>
                 <option *ngFor="let p of participantesNaoAlunos" [value]="p.id">
-                  Participante: {{ p.nome }}
+                  {{ p.nome }}
                 </option>
               </ng-template>
             </select>
