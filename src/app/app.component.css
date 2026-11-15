@@ -846,3 +846,18 @@ body.cdk-global-scrollblock .app-sidebar {
 .app-header {
   z-index: 30;
 }
+
+/* Mobile modal handling */
+@media (max-width: 768px) {
+  /* Ensure modal overlays the sidebar */
+  .app-sidebar {
+    z-index: 10; /* lower than modal (which is >1000) */
+  }
+  body.cdk-global-scrollblock .app-sidebar {
+    display: none !important; /* hide sidebar when modal active */
+  }
+  /* Keep header above modal */
+  .app-header {
+    z-index: 30;
+  }
+}
