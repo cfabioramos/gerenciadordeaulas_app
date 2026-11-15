@@ -365,7 +365,6 @@
 .app-sidebar:hover .nav-item .text,
 .app-sidebar:focus-within .nav-item .text {
   max-width: 180px;
-  opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
 }
@@ -532,7 +531,6 @@
   .app-sidebar:hover .theme-emblem-copy,
   .app-sidebar:focus-within .theme-emblem-copy {
     max-width: 122px;
-    opacity: 1;
     transform: none;
   }
   .theme-emblem-kicker {
@@ -851,7 +849,7 @@ body.cdk-global-scrollblock .app-sidebar {
 @media (max-width: 768px) {
   /* Ensure modal overlays the sidebar */
   .app-sidebar {
-    z-index: 10; /* lower than modal (which is >1000) */
+    z-index: 0; /* lower than modal (which is >1000) */
   }
   body.cdk-global-scrollblock .app-sidebar {
     display: none !important; /* hide sidebar when modal active */
@@ -859,5 +857,53 @@ body.cdk-global-scrollblock .app-sidebar {
   /* Keep header above modal */
   .app-header {
     z-index: 30;
+  }
+}
+/* Mobile fix: ensure header title stays visible */
+@media (max-width: 600px) {
+  .header-content {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-copy {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .brand-title {
+    font-size: 1rem; /* reduce size to fit */
+    white-space: normal;
+    overflow: visible;
+  }
+  .brand-title-prefix {
+    display: none; /* optional: hide prefix to save space */
+  }
+}
+/* Mobile fix for Samsung S25 (≈360 px) */
+@media (max-width: 480px) {
+  /* Reduce header grid to give title more space */
+  .header-content {
+    grid-template-columns: auto 1fr; /* logo + title */
+    gap: 8px;
+  }
+  /* Hide user info (name + logout) to free width */
+  .header-content .user-info {
+    display: none;
+  }
+  /* Allow title to wrap and be visible */
+  .app-header .brand-title {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset;
+    font-size: 0.9rem !important;
+  }
+  /* Optional: hide the "Meu" prefix */
+  .app-header .brand-title-prefix {
+    display: none !important;
+  }
+  /* Align brand copy vertically */
+  .app-header .brand-copy {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
