@@ -538,7 +538,9 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
     this.modalLoading = true;
 
     if (this.formTipoReferencia === 'PARTICIPANTE') {
-      const participante = (item.participantes || []).find(p => p.id === this.formReferenciaId);
+      let participante: ParticipanteEvento | undefined = undefined;
+      if (item.participantes)
+        participante   = item.participantes.find(p => p.id == this.formReferenciaId);
       if (!participante) {
         this.modalLoading = false;
         alert('Participante não encontrado. Atualize a lista e tente novamente.');
@@ -548,7 +550,7 @@ export class EventosViagensComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const aluno = this.alunos.find(a => a.id === this.formReferenciaId);
+    const aluno = this.alunos.find(a => a.id == this.formReferenciaId);
     if (!aluno) {
       this.modalLoading = false;
       alert('Aluno não encontrado.');
