@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const themes = ['nordeste', 'dancacircular', 'forro', 'frevo'];
+    const themes = ['nordeste', 'dancacircular', 'forro', 'frevo', 'capoeira'];
     const randomTheme = themes[Math.floor(Math.random() * themes.length)];
     this.changeTheme(randomTheme);
   }

@@ -49,6 +49,15 @@ describe('AuthService', () => {
     expect(emitted).toBe('forro');
   });
 
+  it('applyTheme Capoeira adiciona a classe correspondente no body', () => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    const svc = TestBed.inject(AuthService);
+    svc.applyTheme('capoeira');
+    expect(document.body.classList.contains('theme-capoeira')).toBeTrue();
+  });
+
   it('updateTheme quando não logado retorna observable de sucesso', (done) => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],

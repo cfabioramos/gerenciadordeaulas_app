@@ -37,7 +37,17 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.getThemeLabel('forro')).toBe('Forró');
+    expect(app.getThemeLabel('capoeira')).toBe('Capoeira');
     expect(app.getThemeLabel('desconhecido')).toBe('desconhecido');
+  });
+
+  it('deve gerar marcas-d\'água com imagens e animação da Capoeira', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    app.generateWatermarks('capoeira');
+    const styles = JSON.stringify(app.contentWatermarks);
+    expect(styles).toContain('/images/capoeira_');
+    expect(app.sidebarWatermarks[0].style.animation).toContain('ginga');
   });
 
   it('deve alternar tema e persistir', () => {
@@ -53,6 +63,15 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.getThemeImage()).toContain('frevo_umbrella.jpg');
+    expect(app.getThemeImage('capoeira')).toContain('capoeira_berimbau.jpg');
+  });
+
+  it('deve incluir a Capoeira no ciclo de temas', () => {
+    localStorage.setItem('theme', 'frevo');
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    app.cycleTheme();
+    expect(localStorage.getItem('theme')).toBe('capoeira');
   });
 
   it('deve chamar applyTheme no construtor com tema salvo', () => {

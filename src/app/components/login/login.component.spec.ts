@@ -36,5 +36,8 @@ describe('LoginComponent', () => {
   it('changeTheme deve persistir e aplicar', () => {
     component.changeTheme('forro');
     expect(localStorage.getItem('theme')).toBe('forro');
+    component.changeTheme('capoeira');
+    expect(localStorage.getItem('theme')).toBe('capoeira');
+    expect(document.body.classList.contains('theme-capoeira')).toBeTrue();
   });
 });

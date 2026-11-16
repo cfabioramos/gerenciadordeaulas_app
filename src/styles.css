@@ -154,6 +154,34 @@ body.theme-frevo .btn-create {
   border: none !important;
 }
 
+/* 5. CAPOEIRA (Azul da roda, dourado do axé e branco do uniforme) */
+body.theme-capoeira {
+  --primary: #0e7490; /* azul profundo da roda */
+  --primary-light: #22a3b8;
+  --footer-bg: #cffafe;
+  --text-dark: #083344;
+  --text-light: #ffffff;
+  --brand-accent: #f4b41a; /* dourado do axé */
+  background-color: #f0fdff;
+}
+
+body.theme-capoeira .list-title {
+  color: #0e7490;
+}
+
+body.theme-capoeira .btn-primary,
+body.theme-capoeira .btn-create,
+body.theme-capoeira .btn-edit {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%) !important;
+  border: none !important;
+  box-shadow: inset 0 -3px 0 #f4b41a;
+}
+
+body.theme-capoeira .btn-primary:hover:not(:disabled),
+body.theme-capoeira .btn-create:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0b5f76 0%, #0e7490 100%) !important;
+}
+
 /* Dropdown de seleção de tema (sidebar) */
 .theme-select {
   padding: 5px 10px;
@@ -551,6 +579,12 @@ body {
   100% { transform: translateY(0) scale(1); }
 }
 
+/* Capoeira: Ginga (balanço lateral do corpo na roda) */
+@keyframes ginga {
+  0% { transform: translateX(-6px) rotate(-7deg); }
+  100% { transform: translateX(6px) rotate(7deg); }
+}
+
 /* 2. LAYOUT DA TELA DE LOGIN (Autenticação leve e bonita) */
 .login-card {
   width: 100%;
@@ -646,6 +680,12 @@ body.theme-forro .login-brand-graphic {
 body.theme-frevo .login-brand-graphic {
   background-image: url('/images/frevo_umbrella.jpg');
   animation: bounce-joy 3s ease-in-out infinite alternate;
+}
+
+/* Capoeira: Ginga na Roda (Balanço do corpo) */
+body.theme-capoeira .login-brand-graphic {
+  background-image: url('/images/capoeira.jpg');
+  animation: ginga 3.2s ease-in-out infinite alternate;
 }
 
 /* ==========================================================================

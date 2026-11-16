@@ -30,16 +30,23 @@ export class AppComponent implements OnInit, OnDestroy {
     'nordeste': ['nordeste_cactus.jpg', 'nordeste_sun.jpg', 'nordeste_hat.jpg'],
     'dancacircular': ['circular_mandala.jpg', 'circular_figures.jpg', 'circular_stars.jpg'],
     'forro': ['forro_accordion.jpg', 'forro_triangle.jpg', 'forro_zabumba.jpg'],
-    'frevo': ['frevo_umbrella.jpg', 'frevo_ribbons.jpg', 'frevo_dancer.jpg']
+    'frevo': ['frevo_umbrella.jpg', 'frevo_ribbons.jpg', 'frevo_dancer.jpg'],
+    'capoeira': ['capoeira_berimbau.jpg', 'capoeira_roda.jpg', 'capoeira_ginga.jpg']
   };
 
-  private readonly themeOrder = ['nordeste', 'dancacircular', 'forro', 'frevo'];
+  private readonly themeOrder = ['nordeste', 'dancacircular', 'forro', 'frevo', 'capoeira'];
 
   private readonly themeLabels: { [key: string]: string } = {
     'nordeste': 'Nordeste',
     'dancacircular': 'Dança Circular',
     'forro': 'Forró',
-    'frevo': 'Frevo'
+    'frevo': 'Frevo',
+    'capoeira': 'Capoeira'
+  };
+
+  // Capoeira: o ginga das marcas-d'água traduz o balanço do corpo na roda
+  private readonly themeAnimations: { [key: string]: string[] } = {
+    'capoeira': ['ginga', 'swing', 'float-slow', 'pulse-slow']
   };
 
   constructor() {
@@ -65,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
   // Generates randomized watermarks distributed across Main Screen, Menu, Footer, and Background
   generateWatermarks(theme: string) {
     const assets = this.themeAssets[theme] || this.themeAssets['nordeste'];
-    const animations = ['pulse-slow', 'spin-slow', 'swing', 'float-slow'];
+    const animations = this.themeAnimations[theme] || ['pulse-slow', 'spin-slow', 'swing', 'float-slow'];
     const isDark = theme === 'dancacircular';
 
     // 1. Tela Principal (Content Area - 6 randomized scattered watermarks)
